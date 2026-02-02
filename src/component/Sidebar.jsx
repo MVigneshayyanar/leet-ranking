@@ -33,10 +33,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h1 className="text-white font-bold text-lg tracking-tight">LeetRank</h1>
-              <p className="text-slate-400 text-xs">M.Tech 2027</p>
+              <p className="text-slate-400 text-xs">M.Tech 2028</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="md:hidden text-slate-400 hover:text-white transition-colors"
           >
@@ -47,14 +47,14 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 space-y-2">
           <p className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Menu</p>
-          
+
           {menuItems.map((item) => {
             const Icon = item.icon;
             // Check if path matches exactly or if it's the root path logic
-            const isActive = item.path === '/' 
-              ? location.pathname === '/' 
+            const isActive = item.path === '/'
+              ? location.pathname === '/'
               : location.pathname.startsWith(item.path);
-            
+
             return (
               <button
                 key={item.id}
@@ -62,11 +62,10 @@ const Sidebar = ({ isOpen, onClose }) => {
                   navigate(item.path);
                   if (onClose) onClose();
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive 
-                    ? 'bg-blue-600/10 text-blue-400 font-medium' 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                    ? 'bg-blue-600/10 text-blue-400 font-medium'
                     : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                }`}
+                  }`}
               >
                 <Icon size={20} className={isActive ? 'text-blue-400' : 'text-slate-500 group-hover:text-white transition-colors'} />
                 <span>{item.label}</span>

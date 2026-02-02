@@ -1,6 +1,6 @@
-# LeetRank - M.Tech 2027 Leaderboard 🏆
+# LeetRank - M.Tech 2028 Leaderboard 🏆
 
-A modern, fast, and responsive leaderboard dashboard to track the LeetCode progress of the M.Tech 2027 batch. Built with React and designed for a premium user experience.
+A modern, fast, and responsive leaderboard dashboard to track the LeetCode progress of the M.Tech 2028 batch. Built with React and designed for a premium user experience.
 
 ![LeetRank Dashboard](https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop) _Note: Add actual screenshots of the dashboard here._
 

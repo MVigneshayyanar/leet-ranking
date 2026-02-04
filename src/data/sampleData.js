@@ -48,7 +48,12 @@ export const usernames = [
     "sec23cj042",
     "karthik_jayaram_sk", // Placeholder for profile/account link
     "selvapriya2104",
-    "mathewEmmanuel"
+    "mathewEmmanuel",
+    "Jebastin_preethi",
+    "poojapoonkodi",
+    "SHREEHARSHINIvk",
+    "dark_web11",
+    "1wJZ0RPa7B"
 ];
 
 export const userNamesMap = {
@@ -101,5 +106,10 @@ export const userNamesMap = {
     "sec23cj042": "Mugilan A",
     "karthik_jayaram_sk": "Karthik Jayaram S K",
     "selvapriya2104": "Selvapriya S",
-    "mathewEmmanuel": "Mathew Emmanuel A"
+    "mathewEmmanuel": "Mathew Emmanuel A",
+    "Jebastin_preethi": "Jebastin preethi J",
+    "poojapoonkodi": "Pooja@Poonkodi",
+    "SHREEHARSHINIvk": "SHREEHARSHINI VK",
+    "dark_web11": "Bhuvanesh M",
+    "1wJZ0RPa7B": "Ashwin Annamalai Lena"
 };

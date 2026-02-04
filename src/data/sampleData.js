@@ -27,7 +27,7 @@ export const usernames = [
     "Udheshkumar1536",
     "ugapriya",
     "Vasanthan__7",
-    "sec23cj024_vidula", // Placeholder for generic problemset link
+    "VIDULA666", // Placeholder for generic problemset link
     "vigneshinr",
     "saai_shrinidhi_s_v",
     "JANARTHANAN_H",
@@ -85,7 +85,7 @@ export const userNamesMap = {
     "Udheshkumar1536": "Udheshkumar C",
     "ugapriya": "UGAPRIYA S",
     "Vasanthan__7": "VASANTHAN M",
-    "sec23cj024_vidula": "Vidula.G",
+    "VIDULA666": "Vidula.G",
     "vigneshinr": "VIGNESHAYYANAR M",
     "saai_shrinidhi_s_v": "Saai Shrindhi S V",
     "JANARTHANAN_H": "H.JANARTHANAN",

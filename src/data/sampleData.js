@@ -14,7 +14,7 @@ export const usernames = [
     "naveensasikumar1503",
     "Nira_26",
     "nithyavarshini_A",
-    "jpxkMi2KB4",
+    "Phargavi_S",
     "Resh_03",
     "s_mridula",
     "mdSE3YJBKr",
@@ -53,7 +53,7 @@ export const usernames = [
     "poojapoonkodi",
     "SHREEHARSHINIvk",
     "dark_web11",
-    "1wJZ0RPa7B"
+    "ashnova07"
 ];
 
 export const userNamesMap = {
@@ -72,7 +72,7 @@ export const userNamesMap = {
     "naveensasikumar1503": "NAVEEN S",
     "Nira_26": "NIRANJANA J",
     "nithyavarshini_A": "Nithya varshini A",
-    "jpxkMi2KB4": "Phargavi S",
+    "Phargavi_S": "Phargavi S",
     "Resh_03": "Reshma N",
     "s_mridula": "S Mridula",
     "mdSE3YJBKr": "SANJAY S",
@@ -111,5 +111,5 @@ export const userNamesMap = {
     "poojapoonkodi": "Pooja@Poonkodi",
     "SHREEHARSHINIvk": "SHREEHARSHINI VK",
     "dark_web11": "Bhuvanesh M",
-    "1wJZ0RPa7B": "Ashwin Annamalai Lena"
+    "ashnova07": "Ashwin Annamalai Lena"
 };

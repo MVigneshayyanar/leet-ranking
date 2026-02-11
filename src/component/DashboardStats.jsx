@@ -366,17 +366,32 @@ const DashboardStats = ({ users }) => {
 
                   <div className="flex flex-col gap-1">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-white hover:text-blue-400 transition-colors cursor-pointer text-sm">{activity.name}</span>
+                      <span className="font-semibold text-white text-sm">{activity.name}</span>
                       <span className="text-[10px] text-slate-600 font-mono whitespace-nowrap">{formatDate(activity.timestamp)}</span>
                     </div>
 
-                    <div className="text-sm">
-                      <span className={`font-medium text-xs uppercase tracking-wider mr-2 ${activity.statusDisplay === 'Accepted' ? 'text-green-400' : 'text-red-400'
-                        }`}>
-                        {activity.statusDisplay}
+                    <a
+                      href={`https://leetcode.com/problems/${activity.titleSlug}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-sm -mx-1 px-1 py-0.5 rounded transition-colors group/link"
+                    >
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span className={`font-medium text-xs uppercase tracking-wider ${activity.statusDisplay === 'Accepted' ? 'text-green-400' : 'text-red-400'}`}>
+                          {activity.statusDisplay}
+                        </span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium border ${activity.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                          activity.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                            activity.difficulty === 'Hard' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                              'bg-slate-700/50 text-slate-400 border-slate-600'
+                          }`}>
+                          {activity.difficulty}
+                        </span>
+                      </div>
+                      <span className="text-slate-300 block truncate group-hover/link:text-blue-400 transition-colors">
+                        {activity.questionFrontendId ? `#${activity.questionFrontendId} ` : ''}{activity.title}
                       </span>
-                      <span className="text-slate-300">{activity.title}</span>
-                    </div>
+                    </a>
                   </div>
                 </div>
               )) : (

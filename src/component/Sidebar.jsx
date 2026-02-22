@@ -39,7 +39,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
             {!isCollapsed && (
               <div className="overflow-hidden whitespace-nowrap">
                 <h1 className="text-white font-bold text-lg tracking-tight">LeetRank</h1>
-                <p className="text-slate-400 text-xs">M.Tech 2027</p>
+                <p className="text-slate-400 text-xs">M.Tech 2028</p>
               </div>
             )}
           </div>

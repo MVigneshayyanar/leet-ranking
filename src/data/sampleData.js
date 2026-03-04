@@ -53,7 +53,8 @@ export const usernames = [
     "poojapoonkodi",
     "SHREEHARSHINIvk",
     "dark_web11",
-    "ashnova07"
+    "ashnova07",
+    "Gowtham_tf"
 ];
 
 export const userNamesMap = {
@@ -111,5 +112,6 @@ export const userNamesMap = {
     "poojapoonkodi": "Pooja@Poonkodi",
     "SHREEHARSHINIvk": "SHREEHARSHINI VK",
     "dark_web11": "Bhuvanesh M",
-    "ashnova07": "Ashwin Annamalai Lena"
+    "ashnova07": "Ashwin Annamalai Lena",
+    "Gowtham_tf": "Mupidathy Gowtham"
 };

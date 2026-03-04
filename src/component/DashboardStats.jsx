@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, AreaChart, Area } from 'recharts';
 import { Users, CheckCircle, Target, Trophy, Flame, Zap, Code, Calendar, Award, ArrowUpRight, Download } from 'lucide-react';
 import { exportToExcel } from '../utils/excelGenerator';
 
 const DashboardStats = ({ users }) => {
+  const navigate = useNavigate();
   // --- Calculate Stats ---
   const {
     totalStudents,
@@ -290,7 +292,12 @@ const DashboardStats = ({ users }) => {
                 </h3>
                 <p className="text-sm text-slate-400">Top 10% performers leading the batch.</p>
               </div>
-              <button className="text-sm text-blue-400 font-medium hover:text-blue-300 transition-colors">View All Rankers</button>
+              <button
+                onClick={() => navigate('/leaderboard')}
+                className="text-sm text-blue-400 font-medium hover:text-blue-300 transition-colors cursor-pointer"
+              >
+                View All Rankers
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

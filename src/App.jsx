@@ -141,6 +141,7 @@ const App = () => {
           message: `Auto-syncing ${student.name}...` 
         });
 
+        try {
           const encoded = encodeURIComponent(student.skillrackUrl);
           let liveData = null;
 

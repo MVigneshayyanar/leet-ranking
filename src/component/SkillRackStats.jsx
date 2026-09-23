@@ -48,21 +48,16 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
   const activeIsSyncing = propIsSyncing !== undefined ? propIsSyncing : isSyncing;
   const activeSyncStatus = propSyncStatus !== undefined ? propSyncStatus : syncStatus;
 
-  // Sync users when initialUsers changes
+  // Sync users immediately whenever initialUsers updates one-by-one from live scrape
   useEffect(() => {
     if (initialUsers && initialUsers.length > 0) {
-      setLocalUsers(prev => {
-        return initialUsers.map(u => {
-          const existing = prev.find(p => p.username === u.username);
-          return existing ? { ...u, ...existing } : u;
-        });
-      });
+      setLocalUsers(initialUsers);
     }
   }, [initialUsers]);
 
-  // AUTOMATIC LIVE SYNC ON PAGE LOAD
+  // AUTOMATIC LIVE SYNC ON PAGE LOAD (Fallback if not driven by App)
   useEffect(() => {
-    if (!hasAutoSynced.current && localUsers && localUsers.length > 0) {
+    if (!propSyncStatus && !hasAutoSynced.current && localUsers && localUsers.length > 0) {
       const studentsWithUrl = localUsers.filter(u => u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume')));
       if (studentsWithUrl.length > 0) {
         hasAutoSynced.current = true;

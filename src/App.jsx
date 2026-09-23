@@ -182,6 +182,9 @@ const App = () => {
             if (userIdx !== -1) {
               updatedUsers[userIdx] = { ...updatedUsers[userIdx], ...liveData };
               setUsersData([...updatedUsers]);
+              try {
+                localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
+              } catch (e) {}
             }
           }
         } catch (err) {

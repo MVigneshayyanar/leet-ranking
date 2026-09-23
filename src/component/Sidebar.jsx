@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Trophy, GraduationCap, X, MessageCircle, Brain, Crown, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
+import { LayoutDashboard, Trophy, GraduationCap, X, MessageCircle, Brain, Crown, ChevronLeft, ChevronRight, Swords, BarChart3 } from 'lucide-react';
 import DailyProblem from './DailyProblem';
 
 const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
@@ -11,6 +11,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
+    { id: 'skillrack', label: 'SkillRack Tracker', icon: BarChart3, path: '/skillrack' },
     { id: 'tournaments', label: 'Tournaments', icon: Swords, path: '/tournaments' },
     { id: 'league-heads', label: 'League Heads', icon: Crown, path: '/league-heads' },
     { id: 'ai-tutor', label: 'AI Tutor', icon: Brain, path: '/dsa-tutor' },

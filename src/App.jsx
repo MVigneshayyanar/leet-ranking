@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { usernames, userNamesMap } from "./data/sampleData";
+import { usernames, userNamesMap, students } from "./data/sampleData";
 import UserList from "./component/UserList";
 import Sidebar from "./component/Sidebar";
 import DashboardStats from "./component/DashboardStats";
 import UserProfile from "./component/UserProfile";
+import SkillRackStats from "./component/SkillRackStats";
 import AITutor from "./component/AITutor";
 import Tournaments from "./component/Tournaments";
 import LeagueHeads from "./component/LeagueHeads";
@@ -25,6 +26,22 @@ const App = () => {
       setError("");
       try {
         const API_BASE_URL = "https://leetcode-api-ecru.vercel.app"; 
+        const skillrackMap = students.reduce((acc, s) => {
+          if (s.username) {
+            acc[s.username] = {
+              points: s.skillrackPoints || 0,
+              collegeId: s.collegeId || "",
+              codeTutor: s.codeTutor || 0,
+              codeTracks: s.codeTracks || 0,
+              dailyChallenge: s.dailyChallenge || 0,
+              dailyTest: s.dailyTest || 0,
+              codeTests: s.codeTests || 0,
+              url: s.skillrackUrl || ""
+            };
+          }
+          return acc;
+        }, {});
+
         const promises = usernames.map((username) =>
           axios
             .get(`${API_BASE_URL}/userProfile/${username}`)
@@ -38,6 +55,14 @@ const App = () => {
                 medium: data.mediumSolved || 0,
                 hard: data.hardSolved || 0,
                 solved: data.totalSolved || 0,
+                skillrackPoints: skillrackMap[username]?.points || 0,
+                collegeId: skillrackMap[username]?.collegeId || "",
+                codeTutor: skillrackMap[username]?.codeTutor || 0,
+                codeTracks: skillrackMap[username]?.codeTracks || 0,
+                dailyChallenge: skillrackMap[username]?.dailyChallenge || 0,
+                dailyTest: skillrackMap[username]?.dailyTest || 0,
+                codeTests: skillrackMap[username]?.codeTests || 0,
+                skillrackUrl: skillrackMap[username]?.url || "",
                 recentSubmissions: data.recentSubmissions || [],
               };
             })
@@ -50,6 +75,14 @@ const App = () => {
                 medium: 0,
                 hard: 0,
                 solved: 0,
+                skillrackPoints: skillrackMap[username]?.points || 0,
+                collegeId: skillrackMap[username]?.collegeId || "",
+                codeTutor: skillrackMap[username]?.codeTutor || 0,
+                codeTracks: skillrackMap[username]?.codeTracks || 0,
+                dailyChallenge: skillrackMap[username]?.dailyChallenge || 0,
+                dailyTest: skillrackMap[username]?.dailyTest || 0,
+                codeTests: skillrackMap[username]?.codeTests || 0,
+                skillrackUrl: skillrackMap[username]?.url || "",
                 recentSubmissions: [],
               };
             })
@@ -132,6 +165,15 @@ const App = () => {
         ) : (
           <Routes>
             <Route path="/" element={<DashboardStats users={usersData} />} />
+            <Route path="/skillrack" element={
+              <SkillRackStats 
+                users={usersData} 
+                onUsersUpdated={(updated) => setUsersData(prev => prev.map(u => {
+                  const m = updated.find(s => s.username === u.username);
+                  return m ? { ...u, ...m } : u;
+                }))}
+              />
+            } />
             <Route path="/leaderboard" element={
               <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden m-6">
                  <UserList users={usersData} />

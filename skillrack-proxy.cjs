@@ -19,7 +19,9 @@ app.get('/scrape', async (req, res) => {
     try {
         const response = await axios.get(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9'
             },
             timeout: 10000
         });
@@ -83,7 +85,11 @@ app.post('/update-students', (req, res) => {
 
             const newContent = content.replace(studentsRegex, `export const students = [\n${formattedStudents}\n];`);
             fs.writeFileSync(filePath, newContent);
-            res.json({ success: true, message: 'Data saved to sampleData.js' });
+
+            const publicDataPath = path.join(process.cwd(), 'public', 'skillrack-data.json');
+            fs.writeFileSync(publicDataPath, JSON.stringify(updatedStudents, null, 2));
+
+            res.json({ success: true, message: 'Data saved to sampleData.js and public/skillrack-data.json' });
         } else {
             res.status(500).json({ error: 'Could not find students array in sampleData.js' });
         }

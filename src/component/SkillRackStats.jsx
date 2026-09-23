@@ -26,11 +26,13 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge with initialUsers to preserve any LeetCode data
-          return initialUsers.map(u => {
-            const match = parsed.find(p => p.username === u.username);
-            return match ? { ...u, ...match } : u;
-          });
+          if (initialUsers && initialUsers.length > 0) {
+            return initialUsers.map(u => {
+              const match = parsed.find(p => p.username === u.username);
+              return match ? { ...u, ...match } : u;
+            });
+          }
+          return parsed;
         }
       }
     } catch (e) {
@@ -111,29 +113,23 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
   // Helper to fetch live scrape data through Netlify functions, Vite dev server, or standalone proxy
   const scrapeStudentUrl = async (url) => {
     const encoded = encodeURIComponent(url);
-    const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number';
+    const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number' && d.skillrackPoints >= 0;
 
-    // 1. Try Netlify Functions endpoint (deployed on Netlify)
+    // 1. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
     try {
-      const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 12000 });
-      if (isValidData(res0.data)) return res0.data;
-    } catch (e0) {}
-
-    // 2. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
-    try {
-      const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
+      const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 8000 });
       if (isValidData(res1.data)) return res1.data;
     } catch (e1) {}
 
-    // 3. Try /scrape
+    // 2. Try Netlify Functions endpoint (deployed on Netlify)
     try {
-      const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
-      if (isValidData(res2.data)) return res2.data;
-    } catch (e2) {}
+      const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 8000 });
+      if (isValidData(res0.data)) return res0.data;
+    } catch (e0) {}
 
-    // 4. Fallback to port 5001 proxy server
+    // 3. Fallback to port 5001 proxy server
     try {
-      const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
+      const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 6000 });
       if (isValidData(res3.data)) return res3.data;
     } catch (e3) {}
 

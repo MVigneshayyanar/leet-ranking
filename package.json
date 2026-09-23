@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "proxy": "node skillrack-proxy.cjs"
+    "proxy": "node skillrack-proxy.cjs",
+    "sync": "node scripts/sync-skillrack.cjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

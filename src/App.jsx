@@ -28,7 +28,18 @@ const App = () => {
       try {
         const API_BASE_URL = "https://leetcode-api-ecru.vercel.app"; 
 
-        // Read cached SkillRack data from localStorage if available
+        // 1. Fetch static CDN dataset if available
+        let jsonStudentsMap = {};
+        try {
+          const cdnRes = await axios.get('/skillrack-data.json', { timeout: 3000 });
+          if (Array.isArray(cdnRes.data)) {
+            cdnRes.data.forEach(s => {
+              if (s.username) jsonStudentsMap[s.username] = s;
+            });
+          }
+        } catch (e) {}
+
+        // 2. Read cached SkillRack data from localStorage if available
         let cachedStudentsMap = {};
         try {
           const cached = localStorage.getItem('skillrack_cached_students');
@@ -45,15 +56,16 @@ const App = () => {
         const skillrackMap = students.reduce((acc, s) => {
           if (s.username) {
             const cached = cachedStudentsMap[s.username];
+            const cdn = jsonStudentsMap[s.username];
             acc[s.username] = {
-              points: cached?.skillrackPoints ?? s.skillrackPoints ?? 0,
-              collegeId: cached?.collegeId || s.collegeId || "",
-              codeTutor: cached?.codeTutor ?? s.codeTutor ?? 0,
-              codeTracks: cached?.codeTracks ?? s.codeTracks ?? 0,
-              dailyChallenge: cached?.dailyChallenge ?? s.dailyChallenge ?? 0,
-              dailyTest: cached?.dailyTest ?? s.dailyTest ?? 0,
-              codeTests: cached?.codeTests ?? s.codeTests ?? 0,
-              url: cached?.skillrackUrl || s.skillrackUrl || ""
+              points: cached?.skillrackPoints ?? cdn?.skillrackPoints ?? s.skillrackPoints ?? 0,
+              collegeId: cached?.collegeId || cdn?.collegeId || s.collegeId || "",
+              codeTutor: cached?.codeTutor ?? cdn?.codeTutor ?? s.codeTutor ?? 0,
+              codeTracks: cached?.codeTracks ?? cdn?.codeTracks ?? s.codeTracks ?? 0,
+              dailyChallenge: cached?.dailyChallenge ?? cdn?.dailyChallenge ?? s.dailyChallenge ?? 0,
+              dailyTest: cached?.dailyTest ?? cdn?.dailyTest ?? s.dailyTest ?? 0,
+              codeTests: cached?.codeTests ?? cdn?.codeTests ?? s.codeTests ?? 0,
+              url: cached?.skillrackUrl || cdn?.skillrackUrl || s.skillrackUrl || ""
             };
           }
           return acc;
@@ -110,14 +122,14 @@ const App = () => {
         setLoading(false);
 
         // AUTOMATICALLY GET LIVE SKILLRACK STATS ON OPEN / REFRESH
-        autoSyncSkillRack(results);
+        autoSyncSkillRack(results, jsonStudentsMap);
       } catch (err) {
         setError(err.message || "An error occurred while fetching data.");
         setLoading(false);
       }
     };
 
-    const autoSyncSkillRack = async (currentUsers) => {
+    const autoSyncSkillRack = async (currentUsers, jsonStudentsMap = {}) => {
       const eligibleStudents = currentUsers.filter(u => 
         u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume'))
       );
@@ -145,42 +157,55 @@ const App = () => {
           const encoded = encodeURIComponent(student.skillrackUrl);
           let liveData = null;
 
-          const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number';
+          const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number' && d.skillrackPoints >= 0;
 
-          // 1. Try Netlify Functions endpoint (on Netlify deployments)
+          // 1. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
           try {
-            const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 12000 });
-            if (isValidData(res0.data)) liveData = res0.data;
-          } catch (e0) {}
+            const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 8000 });
+            if (isValidData(res1.data)) liveData = res1.data;
+          } catch (e1) {}
 
-          // 2. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
+          // 2. Try Netlify Functions endpoint (on Netlify deployments)
           if (!liveData) {
             try {
-              const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
-              if (isValidData(res1.data)) liveData = res1.data;
-            } catch (e1) {}
+              const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 8000 });
+              if (isValidData(res0.data)) liveData = res0.data;
+            } catch (e0) {}
           }
 
-          // 3. Try /scrape
+          // 3. Fallback to local proxy on port 5001
           if (!liveData) {
             try {
-              const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
-              if (isValidData(res2.data)) liveData = res2.data;
-            } catch (e2) {}
-          }
-
-          // 4. Fallback to local proxy on port 5001
-          if (!liveData) {
-            try {
-              const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
+              const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 6000 });
               if (isValidData(res3.data)) liveData = res3.data;
             } catch (e3) {}
+          }
+
+          // 4. Reliable dataset fallback (if cloud functions get blocked by Cloudflare 403 on Netlify)
+          if (!liveData) {
+            const fallbackStudent = students.find(s => s.username === student.username) || jsonStudentsMap[student.username];
+            if (fallbackStudent && fallbackStudent.skillrackPoints !== undefined) {
+              liveData = {
+                codeTutor: fallbackStudent.codeTutor || 0,
+                codeTracks: fallbackStudent.codeTracks || 0,
+                dailyChallenge: fallbackStudent.dailyChallenge || 0,
+                dailyTest: fallbackStudent.dailyTest || 0,
+                codeTests: fallbackStudent.codeTests || 0,
+                skillrackPoints: fallbackStudent.skillrackPoints || 0
+              };
+            }
           }
 
           if (liveData) {
             const userIdx = updatedUsers.findIndex(u => u.username === student.username);
             if (userIdx !== -1) {
-              updatedUsers[userIdx] = { ...updatedUsers[userIdx], ...liveData };
+              const points = liveData.skillrackPoints !== undefined ? liveData.skillrackPoints :
+                             (((liveData.codeTracks || 0) * 2) + ((liveData.dailyChallenge || 0) * 2) + ((liveData.dailyTest || 0) * 20) + ((liveData.codeTests || 0) * 30));
+              updatedUsers[userIdx] = { 
+                ...updatedUsers[userIdx], 
+                ...liveData,
+                skillrackPoints: points
+              };
               setUsersData([...updatedUsers]);
               try {
                 localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
@@ -207,7 +232,7 @@ const App = () => {
         localStorage.setItem('skillrack_last_synced', new Date().toISOString());
       } catch (e) {}
 
-      // Auto-save to sampleData.js
+      // Auto-save to sampleData.js if server is reachable
       try {
         await axios.post('/api/skillrack/update-students', { students: updatedUsers });
       } catch (e) {

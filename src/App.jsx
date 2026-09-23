@@ -141,21 +141,39 @@ const App = () => {
           message: `Auto-syncing ${student.name}...` 
         });
 
-        try {
           const encoded = encodeURIComponent(student.skillrackUrl);
           let liveData = null;
 
+          const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number';
+
+          // 1. Try Netlify Functions endpoint (on Netlify deployments)
           try {
-            const res = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
-            if (res.data && !res.data.error) liveData = res.data;
-          } catch (e1) {
+            const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 12000 });
+            if (isValidData(res0.data)) liveData = res0.data;
+          } catch (e0) {}
+
+          // 2. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
+          if (!liveData) {
+            try {
+              const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
+              if (isValidData(res1.data)) liveData = res1.data;
+            } catch (e1) {}
+          }
+
+          // 3. Try /scrape
+          if (!liveData) {
             try {
               const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
-              if (res2.data && !res2.data.error) liveData = res2.data;
-            } catch (e2) {
+              if (isValidData(res2.data)) liveData = res2.data;
+            } catch (e2) {}
+          }
+
+          // 4. Fallback to local proxy on port 5001
+          if (!liveData) {
+            try {
               const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
-              if (res3.data && !res3.data.error) liveData = res3.data;
-            }
+              if (isValidData(res3.data)) liveData = res3.data;
+            } catch (e3) {}
           }
 
           if (liveData) {

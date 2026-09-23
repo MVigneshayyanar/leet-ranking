@@ -113,24 +113,35 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
     );
   }, [stats.sortedUsers, searchTerm]);
 
-  // Helper to fetch live scrape data through Vite dev server or standalone proxy
+  // Helper to fetch live scrape data through Netlify functions, Vite dev server, or standalone proxy
   const scrapeStudentUrl = async (url) => {
     const encoded = encodeURIComponent(url);
-    // 1. Try relative endpoint (handled by Vite middleware)
+    const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number';
+
+    // 1. Try Netlify Functions endpoint (deployed on Netlify)
     try {
-      const res = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
-      if (res.data && !res.data.error) return res.data;
-    } catch (e) {
-      // 2. Fallback to /scrape (relative)
-      try {
-        const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
-        if (res2.data && !res2.data.error) return res2.data;
-      } catch (e2) {
-        // 3. Fallback to port 5001 proxy server
-        const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
-        if (res3.data && !res3.data.error) return res3.data;
-      }
-    }
+      const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 12000 });
+      if (isValidData(res0.data)) return res0.data;
+    } catch (e0) {}
+
+    // 2. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
+    try {
+      const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
+      if (isValidData(res1.data)) return res1.data;
+    } catch (e1) {}
+
+    // 3. Try /scrape
+    try {
+      const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
+      if (isValidData(res2.data)) return res2.data;
+    } catch (e2) {}
+
+    // 4. Fallback to port 5001 proxy server
+    try {
+      const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
+      if (isValidData(res3.data)) return res3.data;
+    } catch (e3) {}
+
     return null;
   };
 

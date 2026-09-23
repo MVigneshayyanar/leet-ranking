@@ -19,6 +19,7 @@ const App = () => {
   const [error, setError] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [skillrackSyncStatus, setSkillrackSyncStatus] = useState({ isSyncing: false, current: 0, total: 0, message: '' });
   const location = useLocation();
 
   useEffect(() => {
@@ -26,17 +27,33 @@ const App = () => {
       setError("");
       try {
         const API_BASE_URL = "https://leetcode-api-ecru.vercel.app"; 
+
+        // Read cached SkillRack data from localStorage if available
+        let cachedStudentsMap = {};
+        try {
+          const cached = localStorage.getItem('skillrack_cached_students');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(s => {
+                if (s.username) cachedStudentsMap[s.username] = s;
+              });
+            }
+          }
+        } catch (e) {}
+
         const skillrackMap = students.reduce((acc, s) => {
           if (s.username) {
+            const cached = cachedStudentsMap[s.username];
             acc[s.username] = {
-              points: s.skillrackPoints || 0,
-              collegeId: s.collegeId || "",
-              codeTutor: s.codeTutor || 0,
-              codeTracks: s.codeTracks || 0,
-              dailyChallenge: s.dailyChallenge || 0,
-              dailyTest: s.dailyTest || 0,
-              codeTests: s.codeTests || 0,
-              url: s.skillrackUrl || ""
+              points: cached?.skillrackPoints ?? s.skillrackPoints ?? 0,
+              collegeId: cached?.collegeId || s.collegeId || "",
+              codeTutor: cached?.codeTutor ?? s.codeTutor ?? 0,
+              codeTracks: cached?.codeTracks ?? s.codeTracks ?? 0,
+              dailyChallenge: cached?.dailyChallenge ?? s.dailyChallenge ?? 0,
+              dailyTest: cached?.dailyTest ?? s.dailyTest ?? 0,
+              codeTests: cached?.codeTests ?? s.codeTests ?? 0,
+              url: cached?.skillrackUrl || s.skillrackUrl || ""
             };
           }
           return acc;
@@ -90,10 +107,91 @@ const App = () => {
 
         const results = await Promise.all(promises);
         setUsersData(results);
+        setLoading(false);
+
+        // AUTOMATICALLY GET LIVE SKILLRACK STATS ON OPEN / REFRESH
+        autoSyncSkillRack(results);
       } catch (err) {
         setError(err.message || "An error occurred while fetching data.");
-      } finally {
         setLoading(false);
+      }
+    };
+
+    const autoSyncSkillRack = async (currentUsers) => {
+      const eligibleStudents = currentUsers.filter(u => 
+        u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume'))
+      );
+      if (eligibleStudents.length === 0) return;
+
+      setSkillrackSyncStatus({ 
+        isSyncing: true, 
+        current: 0, 
+        total: eligibleStudents.length, 
+        message: 'Auto-syncing live SkillRack data...' 
+      });
+
+      const updatedUsers = [...currentUsers];
+
+      for (let i = 0; i < eligibleStudents.length; i++) {
+        const student = eligibleStudents[i];
+        setSkillrackSyncStatus({ 
+          isSyncing: true, 
+          current: i + 1, 
+          total: eligibleStudents.length, 
+          message: `Auto-syncing ${student.name}...` 
+        });
+
+        try {
+          const encoded = encodeURIComponent(student.skillrackUrl);
+          let liveData = null;
+
+          try {
+            const res = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 12000 });
+            if (res.data && !res.data.error) liveData = res.data;
+          } catch (e1) {
+            try {
+              const res2 = await axios.get(`/scrape?url=${encoded}`, { timeout: 12000 });
+              if (res2.data && !res2.data.error) liveData = res2.data;
+            } catch (e2) {
+              const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 12000 });
+              if (res3.data && !res3.data.error) liveData = res3.data;
+            }
+          }
+
+          if (liveData) {
+            const userIdx = updatedUsers.findIndex(u => u.username === student.username);
+            if (userIdx !== -1) {
+              updatedUsers[userIdx] = { ...updatedUsers[userIdx], ...liveData };
+              setUsersData([...updatedUsers]);
+            }
+          }
+        } catch (err) {
+          console.warn(`Live sync error for ${student.name}:`, err.message);
+        }
+
+        await new Promise(r => setTimeout(r, 60));
+      }
+
+      setSkillrackSyncStatus({ 
+        isSyncing: false, 
+        current: eligibleStudents.length, 
+        total: eligibleStudents.length, 
+        message: 'Live Synced' 
+      });
+
+      // Cache to localStorage
+      try {
+        localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
+        localStorage.setItem('skillrack_last_synced', new Date().toISOString());
+      } catch (e) {}
+
+      // Auto-save to sampleData.js
+      try {
+        await axios.post('/api/skillrack/update-students', { students: updatedUsers });
+      } catch (e) {
+        try {
+          await axios.post('http://localhost:5001/update-students', { students: updatedUsers });
+        } catch (e2) {}
       }
     };
 
@@ -168,6 +266,8 @@ const App = () => {
             <Route path="/skillrack" element={
               <SkillRackStats 
                 users={usersData} 
+                syncStatus={skillrackSyncStatus}
+                isSyncing={skillrackSyncStatus.isSyncing}
                 onUsersUpdated={(updated) => setUsersData(prev => prev.map(u => {
                   const m = updated.find(s => s.username === u.username);
                   return m ? { ...u, ...m } : u;

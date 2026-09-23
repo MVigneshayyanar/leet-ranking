@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { Trophy, Star, TrendingUp, Users, Medal, Zap, BookOpen, Target, Award, Info, ChevronDown, ChevronUp, RefreshCw, Save, Search, Download } from 'lucide-react';
+import { Trophy, Star, TrendingUp, Users, Medal, Zap, BookOpen, Target, Award, Info, ChevronDown, ChevronUp, RefreshCw, Search, Download } from 'lucide-react';
 import axios from 'axios';
 
 // Helper icons
@@ -18,7 +18,7 @@ const ExternalLink = ({ size = 14, className = "" }) => (
   </svg>
 );
 
-const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated }) => {
+const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: propSyncStatus, isSyncing: propIsSyncing }) => {
   // Load initial cached data from localStorage if available
   const [localUsers, setLocalUsers] = useState(() => {
     try {
@@ -44,6 +44,9 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated }) => {
   const [syncStatus, setSyncStatus] = useState({ current: 0, total: 0, message: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const hasAutoSynced = useRef(false);
+
+  const activeIsSyncing = propIsSyncing !== undefined ? propIsSyncing : isSyncing;
+  const activeSyncStatus = propSyncStatus !== undefined ? propSyncStatus : syncStatus;
 
   // Sync users when initialUsers changes
   useEffect(() => {
@@ -205,30 +208,6 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated }) => {
     setTimeout(() => setSyncStatus(prev => ({ ...prev, message: '' })), 4000);
   };
 
-  const handleSaveToFile = async () => {
-    try {
-      setSyncStatus(prev => ({ ...prev, message: 'Saving to sampleData.js...' }));
-      let saved = false;
-
-      try {
-        await axios.post('/api/skillrack/update-students', { students: localUsers });
-        saved = true;
-      } catch (e) {
-        await axios.post('http://localhost:5001/update-students', { students: localUsers });
-        saved = true;
-      }
-
-      if (saved) {
-        setSyncStatus(prev => ({ ...prev, message: 'Data saved successfully to sampleData.js!' }));
-        setTimeout(() => setSyncStatus(prev => ({ ...prev, message: '' })), 3000);
-      }
-    } catch (error) {
-      console.error('Failed to save data:', error.message);
-      setSyncStatus(prev => ({ ...prev, message: 'Error saving data' }));
-      setTimeout(() => setSyncStatus(prev => ({ ...prev, message: '' })), 3000);
-    }
-  };
-
   const handleExportExcel = () => {
     const headers = ['S.No', 'College ID', 'Name', 'Username', 'Code Tutor', 'Code Tracks', 'DC', 'DT', 'Code Tests', 'Total Solved', 'SkillRack Points'];
     const rows = stats.sortedUsers.map((user, idx) => [
@@ -316,29 +295,18 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated }) => {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-            {syncStatus.message && (
+            {activeIsSyncing ? (
                 <div className="flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-xl border border-blue-500/20 animate-pulse text-xs font-bold">
-                    <RefreshCw size={14} className="animate-spin" />
-                    <span>{syncStatus.message}</span>
-                    {syncStatus.total > 0 && <span className="text-blue-300">({syncStatus.current}/{syncStatus.total})</span>}
+                    <RefreshCw size={14} className="animate-spin text-blue-400" />
+                    <span>{activeSyncStatus.message || 'Auto-syncing live data...'}</span>
+                    {activeSyncStatus.total > 0 && <span className="text-blue-300 font-mono">({activeSyncStatus.current}/{activeSyncStatus.total})</span>}
+                </div>
+            ) : (
+                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3.5 py-2 rounded-xl border border-emerald-500/20 text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Live Auto-Sync Active</span>
                 </div>
             )}
-            <button 
-                onClick={() => handleSyncAll({ auto: false })}
-                disabled={isSyncing}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-60 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 text-sm cursor-pointer"
-            >
-                <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
-                <span>{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
-            </button>
-            <button 
-                onClick={handleSaveToFile}
-                disabled={isSyncing}
-                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2.5 rounded-xl font-bold transition-all border border-slate-700 active:scale-95 text-sm cursor-pointer"
-            >
-                <Save size={16} />
-                <span>Save</span>
-            </button>
             <button 
                 onClick={handleExportExcel}
                 className="flex items-center gap-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-emerald-700/50 active:scale-95 text-sm cursor-pointer"

@@ -4,6 +4,10 @@ A modern, fast, and responsive leaderboard dashboard to track the LeetCode progr
 
 ![LeetRank Dashboard](https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop) _Note: Replace with actual application screenshots._
 
+Hello everyone
+
+
+
 ## ✨ Features
 
 - **📊 Comprehensive Dashboard**: Real-time class statistics, including total problems solved and difficulty breakdown (Easy, Medium, Hard).

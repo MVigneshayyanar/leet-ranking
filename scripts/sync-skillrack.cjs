@@ -3,97 +3,159 @@ const path = require('path');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_DELAY_MS = 250;
+
+const LABEL_MAP = {
+  CODETRACK: 'codeTracks',
+  CODETRACKS: 'codeTracks',
+  CODETEST: 'codeTests',
+  CODETESTS: 'codeTests',
+  DAILYCHALLENGE: 'dailyChallenge',
+  DC: 'dailyChallenge',
+  DAILYTEST: 'dailyTest',
+  DT: 'dailyTest',
+  CODETUTOR: 'codeTutor'
+};
+
+function normalizeLabel(label = '') {
+  return label.toUpperCase().replace(/[^A-Z]/g, '');
+}
+
+function toInt(value) {
+  if (value == null) return 0;
+  const parsed = Number.parseInt(String(value).replace(/[^\d]/g, ''), 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function calculatePoints({ codeTracks = 0, dailyChallenge = 0, dailyTest = 0, codeTests = 0 }) {
+  return (codeTracks * 2) + (dailyChallenge * 2) + (dailyTest * 20) + (codeTests * 30);
+}
+
+function isValidProfileUrl(url) {
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (!host.includes('skillrack.com')) return false;
+
+    const pathname = parsed.pathname.toLowerCase();
+    return pathname.includes('/profile/') || pathname.includes('resume.xhtml');
+  } catch {
+    return false;
+  }
+}
+
+function extractStats(html) {
+  const $ = cheerio.load(html);
+  const stats = {
+    codeTutor: 0,
+    codeTracks: 0,
+    dailyChallenge: 0,
+    dailyTest: 0,
+    codeTests: 0
+  };
+
+  $('.statistic').each((_, el) => {
+    const label = normalizeLabel($(el).find('.label').text().trim());
+    const value = toInt($(el).find('.value').text());
+    const key = LABEL_MAP[label];
+
+    if (key) {
+      stats[key] = value;
+    }
+  });
+
+  // Fallback parsing when `.statistic` blocks are unavailable.
+  if (!Object.values(stats).some(Boolean)) {
+    const text = $.text();
+    const fallbackRegex = /(CODE\s*TRACKS?|DAILY\s*CHALLENGE|\bDC\b|DAILY\s*TEST|\bDT\b|CODE\s*TESTS?|CODE\s*TUTOR)\D*([\d,]+)/gi;
+
+    for (const match of text.matchAll(fallbackRegex)) {
+      const key = LABEL_MAP[normalizeLabel(match[1])];
+      if (key) {
+        stats[key] = toInt(match[2]);
+      }
+    }
+  }
+
+  return stats;
+}
+
+function serializeStudent(student) {
+  const field = (value) => JSON.stringify(value ?? '');
+
+  return `  { collegeId: ${field(student.collegeId)}, name: ${field(student.name)}, username: ${field(student.username)}, skillrackUrl: ${field(student.skillrackUrl)}, codeTutor: ${toInt(student.codeTutor)}, codeTracks: ${toInt(student.codeTracks)}, dailyChallenge: ${toInt(student.dailyChallenge)}, dailyTest: ${toInt(student.dailyTest)}, codeTests: ${toInt(student.codeTests)}, skillrackPoints: ${toInt(student.skillrackPoints)} }`;
+}
+
+async function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function scrapeAll() {
   const filePath = path.join(__dirname, '..', 'src', 'data', 'sampleData.js');
   const publicDataPath = path.join(__dirname, '..', 'public', 'skillrack-data.json');
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const studentsRegex = /export const students = \s*\[([\s\S]*?)\];/;
+  const studentsRegex = /export const students =\s*\[([\s\S]*?)\];/;
   const match = content.match(studentsRegex);
+
   if (!match) {
-    console.error('Could not find students array in sampleData.js');
-    process.exit(1);
+    throw new Error('Could not find students array in sampleData.js');
   }
 
-  // Parse students using Function
   const parseStudents = new Function(`return [${match[1]}];`);
   const students = parseStudents();
-  console.log(`Found ${students.length} students. Starting live SkillRack scrape...`);
 
-  const updatedStudents = [...students];
+  console.log(`Found ${students.length} students. Starting SkillRack sync...`);
 
-  for (let i = 0; i < updatedStudents.length; i++) {
-    const s = updatedStudents[i];
-    if (!s.skillrackUrl || (!s.skillrackUrl.includes('profile') && !s.skillrackUrl.includes('resume'))) {
-      console.log(`[${i + 1}/${updatedStudents.length}] Skipped ${s.name} (No valid profile URL)`);
+  for (let i = 0; i < students.length; i += 1) {
+    const student = students[i];
+
+    if (!isValidProfileUrl(student.skillrackUrl)) {
+      console.log(`[${i + 1}/${students.length}] Skipped ${student.name} (invalid or non-profile URL)`);
       continue;
     }
 
     try {
-      const response = await axios.get(s.skillrackUrl, {
+      const response = await axios.get(student.skillrackUrl, {
+        timeout: REQUEST_TIMEOUT_MS,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.9'
-        },
-        timeout: 10000
-      });
-
-      const $ = cheerio.load(response.data);
-      const labelMap = {
-        'PROGRAMS SOLVED': 'programsSolved',
-        'CODE TEST': 'codeTests',
-        'CODE TRACK': 'codeTracks',
-        'DC': 'dailyChallenge',
-        'DT': 'dailyTest',
-        'CODE TUTOR': 'codeTutor'
-      };
-
-      const stats = {};
-      $('.statistic').each((_, el) => {
-        const val = $(el).find('.value').text().trim();
-        const lab = $(el).find('.label').text().trim();
-        if (labelMap[lab]) {
-          stats[labelMap[lab]] = parseInt(val.replace(/,/g, '')) || 0;
         }
       });
 
-      const points = ((stats.codeTracks || 0) * 2) + 
-                     ((stats.dailyChallenge || 0) * 2) + 
-                     ((stats.dailyTest || 0) * 20) + 
-                     ((stats.codeTests || 0) * 30);
+      const stats = extractStats(response.data);
+      student.codeTutor = stats.codeTutor;
+      student.codeTracks = stats.codeTracks;
+      student.dailyChallenge = stats.dailyChallenge;
+      student.dailyTest = stats.dailyTest;
+      student.codeTests = stats.codeTests;
+      student.skillrackPoints = calculatePoints(stats);
 
-      s.codeTutor = stats.codeTutor || 0;
-      s.codeTracks = stats.codeTracks || 0;
-      s.dailyChallenge = stats.dailyChallenge || 0;
-      s.dailyTest = stats.dailyTest || 0;
-      s.codeTests = stats.codeTests || 0;
-      s.skillrackPoints = points;
-
-      console.log(`[${i + 1}/${updatedStudents.length}] ${s.name} => Tracks: ${s.codeTracks}, DC: ${s.dailyChallenge}, DT: ${s.dailyTest}, Tests: ${s.codeTests}, Points: ${points}`);
-    } catch (err) {
-      console.warn(`[${i + 1}/${updatedStudents.length}] Failed to scrape ${s.name}:`, err.message);
+      console.log(
+        `[${i + 1}/${students.length}] ${student.name} -> Tracks: ${student.codeTracks}, DC: ${student.dailyChallenge}, DT: ${student.dailyTest}, Tests: ${student.codeTests}, Points: ${student.skillrackPoints}`
+      );
+    } catch (error) {
+      console.warn(`[${i + 1}/${students.length}] Failed for ${student.name}: ${error.message}`);
     }
 
-    // Small delay to be polite
-    await new Promise(r => setTimeout(r, 80));
+    await delay(REQUEST_DELAY_MS);
   }
 
-  // Format updated students array back into sampleData.js
-  const formatted = updatedStudents.map(s => 
-    `  { collegeId: "${s.collegeId || ''}", name: "${s.name}", username: "${s.username}", skillrackUrl: "${s.skillrackUrl || ''}", codeTutor: ${s.codeTutor || 0}, codeTracks: ${s.codeTracks || 0}, dailyChallenge: ${s.dailyChallenge || 0}, dailyTest: ${s.dailyTest || 0}, codeTests: ${s.codeTests || 0}, skillrackPoints: ${s.skillrackPoints || 0} }`
-  ).join(',\n');
+  const formattedStudents = students.map(serializeStudent).join(',\n');
+  const nextContent = content.replace(studentsRegex, `export const students = [\n${formattedStudents}\n];`);
 
-  const newContent = content.replace(studentsRegex, `export const students = [\n${formatted}\n];`);
-  fs.writeFileSync(filePath, newContent, 'utf8');
-  console.log('Successfully updated src/data/sampleData.js with live SkillRack data!');
+  fs.writeFileSync(filePath, nextContent, 'utf8');
+  fs.writeFileSync(publicDataPath, `${JSON.stringify(students, null, 2)}\n`, 'utf8');
 
-  // Also write public/skillrack-data.json for Netlify CDN hosting
-  if (!fs.existsSync(path.dirname(publicDataPath))) {
-    fs.mkdirSync(path.dirname(publicDataPath), { recursive: true });
-  }
-  fs.writeFileSync(publicDataPath, JSON.stringify(updatedStudents, null, 2), 'utf8');
-  console.log('Successfully wrote public/skillrack-data.json for CDN hosting!');
+  console.log('Updated src/data/sampleData.js and public/skillrack-data.json');
 }
 
-scrapeAll().catch(console.error);
+scrapeAll().catch((error) => {
+  console.error(error.message);
+  process.exitCode = 1;
+});

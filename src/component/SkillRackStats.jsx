@@ -1,7 +1,6 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { Trophy, Star, TrendingUp, Users, Medal, Zap, BookOpen, Target, Award, Info, ChevronDown, ChevronUp, RefreshCw, Search, Download } from 'lucide-react';
-import axios from 'axios';
+import { Trophy, Star, TrendingUp, Users, Medal, Zap, BookOpen, Target, Award, Info, ChevronDown, ChevronUp, Search, Download } from 'lucide-react';
 
 // Helper icons
 const Crown = ({ size = 20, className = "" }) => (
@@ -18,7 +17,7 @@ const ExternalLink = ({ size = 14, className = "" }) => (
   </svg>
 );
 
-const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: propSyncStatus, isSyncing: propIsSyncing }) => {
+const SkillRackStats = ({ users: initialUsers = [], lastUpdated = '' }) => {
   // Load initial cached data from localStorage if available
   const [localUsers, setLocalUsers] = useState(() => {
     try {
@@ -42,35 +41,20 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
   });
 
   const [expandedUser, setExpandedUser] = useState(null);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState({ current: 0, total: 0, message: '' });
   const [searchTerm, setSearchTerm] = useState('');
-  const hasAutoSynced = useRef(false);
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
-  const activeIsSyncing = propIsSyncing !== undefined ? propIsSyncing : isSyncing;
-  const activeSyncStatus = propSyncStatus !== undefined ? propSyncStatus : syncStatus;
-
-  // Sync users immediately whenever initialUsers updates one-by-one from live scrape
+  // Sync users whenever parent data refreshes
   useEffect(() => {
     if (initialUsers && initialUsers.length > 0) {
       setLocalUsers(initialUsers);
     }
   }, [initialUsers]);
 
-  // AUTOMATIC LIVE SYNC ON PAGE LOAD (Fallback if not driven by App)
   useEffect(() => {
-    if (!propSyncStatus && !hasAutoSynced.current && localUsers && localUsers.length > 0) {
-      const studentsWithUrl = localUsers.filter(u => u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume')));
-      if (studentsWithUrl.length > 0) {
-        hasAutoSynced.current = true;
-        // Delay slightly for initial render to be fast
-        const timer = setTimeout(() => {
-          handleSyncAll({ auto: true });
-        }, 800);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [localUsers]);
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const stats = useMemo(() => {
     const sortedUsers = [...localUsers].sort((a, b) => (b.skillrackPoints || 0) - (a.skillrackPoints || 0));
@@ -110,105 +94,35 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
     );
   }, [stats.sortedUsers, searchTerm]);
 
-  // Helper to fetch live scrape data through Netlify functions, Vite dev server, or standalone proxy
-  const scrapeStudentUrl = async (url) => {
-    const encoded = encodeURIComponent(url);
-    const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number' && d.skillrackPoints >= 0;
+  const lastUpdatedTime = useMemo(() => {
+    const fallback = localStorage.getItem('skillrack_last_synced') || '';
+    const raw = lastUpdated || fallback;
+    const parsed = raw ? Date.parse(raw) : NaN;
+    return Number.isNaN(parsed) ? null : parsed;
+  }, [lastUpdated]);
 
-    // 1. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
-    try {
-      const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 8000 });
-      if (isValidData(res1.data)) return res1.data;
-    } catch (e1) {}
+  const lastUpdatedStr = useMemo(() => {
+    if (!lastUpdatedTime) return 'Unknown';
+    const diffMs = Math.max(0, currentTime - lastUpdatedTime);
+    const totalMinutes = Math.floor(diffMs / (60 * 1000));
+    if (totalMinutes < 1) return 'Just now';
+    if (totalMinutes < 60) return `${totalMinutes}m ago`;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes > 0 ? `${hours}h ${minutes}m ago` : `${hours}h ago`;
+  }, [currentTime, lastUpdatedTime]);
 
-    // 2. Try Netlify Functions endpoint (deployed on Netlify)
-    try {
-      const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 8000 });
-      if (isValidData(res0.data)) return res0.data;
-    } catch (e0) {}
-
-    // 3. Fallback to port 5001 proxy server
-    try {
-      const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 6000 });
-      if (isValidData(res3.data)) return res3.data;
-    } catch (e3) {}
-
-    return null;
-  };
-
-  const handleSyncAll = async ({ auto = false } = {}) => {
-    if (isSyncing) return;
-    setIsSyncing(true);
-
-    const eligibleStudents = localUsers.filter(u => 
-      u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume'))
-    );
-
-    setSyncStatus({ 
-      current: 0, 
-      total: eligibleStudents.length, 
-      message: auto ? 'Auto-syncing live SkillRack data...' : 'Initializing live sync...' 
-    });
-
-    const updatedUsers = [...localUsers];
-
-    for (let i = 0; i < eligibleStudents.length; i++) {
-      const student = eligibleStudents[i];
-      setSyncStatus({ 
-        current: i + 1, 
-        total: eligibleStudents.length, 
-        message: `Syncing ${student.name}...` 
-      });
-
-      try {
-        const liveData = await scrapeStudentUrl(student.skillrackUrl);
-        if (liveData) {
-          const userIndex = updatedUsers.findIndex(u => u.username === student.username);
-          if (userIndex !== -1) {
-            updatedUsers[userIndex] = {
-              ...updatedUsers[userIndex],
-              ...liveData
-            };
-            // Incrementally update UI
-            setLocalUsers([...updatedUsers]);
-          }
-        }
-      } catch (error) {
-        console.warn(`Failed to sync ${student.name}:`, error.message);
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 80));
-    }
-
-    setLocalUsers(updatedUsers);
-    setIsSyncing(false);
-    
-    // Save to localStorage cache
-    try {
-      localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
-      localStorage.setItem('skillrack_last_synced', new Date().toISOString());
-    } catch (e) {
-      console.warn(e);
-    }
-
-    if (onUsersUpdated) {
-      onUsersUpdated(updatedUsers);
-    }
-
-    // Auto-save to sampleData.js if server allows
-    try {
-      await axios.post('/api/skillrack/update-students', { students: updatedUsers });
-    } catch (e) {
-      try {
-        await axios.post('http://localhost:5001/update-students', { students: updatedUsers });
-      } catch (e2) {
-        // Silent fail for auto-save
-      }
-    }
-
-    setSyncStatus({ current: 0, total: 0, message: 'Live sync complete!' });
-    setTimeout(() => setSyncStatus(prev => ({ ...prev, message: '' })), 4000);
-  };
+  const nextSyncCountdown = useMemo(() => {
+    if (!lastUpdatedTime) return '--:--:--';
+    const cycleMs = 120 * 60 * 1000;
+    const elapsed = Math.max(0, currentTime - lastUpdatedTime);
+    const remainder = elapsed % cycleMs;
+    const remaining = remainder === 0 ? cycleMs : cycleMs - remainder;
+    const hrs = String(Math.floor(remaining / (60 * 60 * 1000))).padStart(2, '0');
+    const mins = String(Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))).padStart(2, '0');
+    const secs = String(Math.floor((remaining % (60 * 1000)) / 1000)).padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  }, [currentTime, lastUpdatedTime]);
 
   const handleExportExcel = () => {
     const headers = ['S.No', 'College ID', 'Name', 'Username', 'Code Tutor', 'Code Tracks', 'DC', 'DT', 'Code Tests', 'Total Solved', 'SkillRack Points'];
@@ -288,27 +202,18 @@ const SkillRackStats = ({ users: initialUsers = [], onUsersUpdated, syncStatus: 
                 <Medal className="text-blue-400" size={28} />
              </div>
              <div>
-               <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-2">
                  SkillRack Tracker
-                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Live Sync</span>
                </h2>
                <p className="text-slate-400 text-xs md:text-sm">Real-time SkillRack points and test competency tracking.</p>
              </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-            {activeIsSyncing ? (
-                <div className="flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-xl border border-blue-500/20 animate-pulse text-xs font-bold">
-                    <RefreshCw size={14} className="animate-spin text-blue-400" />
-                    <span>{activeSyncStatus.message || 'Auto-syncing live data...'}</span>
-                    {activeSyncStatus.total > 0 && <span className="text-blue-300 font-mono">({activeSyncStatus.current}/{activeSyncStatus.total})</span>}
-                </div>
-            ) : (
-                <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3.5 py-2 rounded-xl border border-emerald-500/20 text-xs font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Live Auto-Sync Active</span>
-                </div>
-            )}
+        <div className="flex flex-wrap items-center justify-end gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2 bg-blue-500/10 text-blue-300 px-3.5 py-2 rounded-xl border border-blue-500/30 text-[11px] md:text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                <span>Updated: {lastUpdatedStr} • Next sync: {nextSyncCountdown}</span>
+            </div>
             <button 
                 onClick={handleExportExcel}
                 className="flex items-center gap-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-emerald-700/50 active:scale-95 text-sm cursor-pointer"

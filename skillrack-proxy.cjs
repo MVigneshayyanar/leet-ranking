@@ -87,7 +87,8 @@ app.post('/update-students', (req, res) => {
             fs.writeFileSync(filePath, newContent);
 
             const publicDataPath = path.join(process.cwd(), 'public', 'skillrack-data.json');
-            fs.writeFileSync(publicDataPath, JSON.stringify(updatedStudents, null, 2));
+            const lastUpdated = new Date().toISOString();
+            fs.writeFileSync(publicDataPath, JSON.stringify({ students: updatedStudents, lastUpdated }, null, 2));
 
             res.json({ success: true, message: 'Data saved to sampleData.js and public/skillrack-data.json' });
         } else {

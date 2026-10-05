@@ -92,7 +92,8 @@ async function scrapeAll() {
   if (!fs.existsSync(path.dirname(publicDataPath))) {
     fs.mkdirSync(path.dirname(publicDataPath), { recursive: true });
   }
-  fs.writeFileSync(publicDataPath, JSON.stringify(updatedStudents, null, 2), 'utf8');
+  const lastUpdated = new Date().toISOString();
+  fs.writeFileSync(publicDataPath, JSON.stringify({ students: updatedStudents, lastUpdated }, null, 2), 'utf8');
   console.log('Successfully wrote public/skillrack-data.json for CDN hosting!');
 }
 

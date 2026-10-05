@@ -7,9 +7,27 @@ const path = require('path');
 
 const app = express();
 const PORT = 5001;
+const updateRateWindowMs = 60 * 1000;
+const updateRateLimit = 20;
+const updateHits = new Map();
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+
+const limitUpdateStudents = (req, res, next) => {
+    const now = Date.now();
+    const key = req.ip || req.socket.remoteAddress || 'unknown';
+    const previous = updateHits.get(key) || [];
+    const recent = previous.filter((time) => now - time < updateRateWindowMs);
+
+    if (recent.length >= updateRateLimit) {
+        return res.status(429).json({ error: 'Too many update requests. Please try again in a minute.' });
+    }
+
+    recent.push(now);
+    updateHits.set(key, recent);
+    return next();
+};
 
 // Scrape student profile
 app.get('/scrape', async (req, res) => {
@@ -65,7 +83,7 @@ app.get('/scrape', async (req, res) => {
 });
 
 // Update sampleData.js with new student metrics
-app.post('/update-students', (req, res) => {
+app.post('/update-students', limitUpdateStudents, (req, res) => {
     const { students: updatedStudents } = req.body;
     if (!updatedStudents) return res.status(400).json({ error: 'Students data is required' });
 

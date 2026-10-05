@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { usernames, userNamesMap, students } from "./data/sampleData";
 import UserList from "./component/UserList";
 import Sidebar from "./component/Sidebar";
@@ -17,10 +17,9 @@ const App = () => {
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [skillrackSyncStatus, setSkillrackSyncStatus] = useState({ isSyncing: false, current: 0, total: 0, message: '' });
-  const location = useLocation();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,8 +31,17 @@ const App = () => {
         let jsonStudentsMap = {};
         try {
           const cdnRes = await axios.get('/skillrack-data.json', { timeout: 3000 });
-          if (Array.isArray(cdnRes.data)) {
-            cdnRes.data.forEach(s => {
+          const payload = cdnRes?.data;
+          const cdnStudents = Array.isArray(payload) ? payload : payload?.students;
+          const cdnLastUpdated = payload?.lastUpdated || localStorage.getItem('skillrack_last_synced') || '';
+
+          if (cdnLastUpdated) {
+            setLastUpdated(cdnLastUpdated);
+            localStorage.setItem('skillrack_last_synced', cdnLastUpdated);
+          }
+
+          if (Array.isArray(cdnStudents)) {
+            cdnStudents.forEach(s => {
               if (s.username) jsonStudentsMap[s.username] = s;
             });
           }
@@ -120,125 +128,9 @@ const App = () => {
         const results = await Promise.all(promises);
         setUsersData(results);
         setLoading(false);
-
-        // AUTOMATICALLY GET LIVE SKILLRACK STATS ON OPEN / REFRESH
-        autoSyncSkillRack(results, jsonStudentsMap);
       } catch (err) {
         setError(err.message || "An error occurred while fetching data.");
         setLoading(false);
-      }
-    };
-
-    const autoSyncSkillRack = async (currentUsers, jsonStudentsMap = {}) => {
-      const eligibleStudents = currentUsers.filter(u => 
-        u.skillrackUrl && (u.skillrackUrl.includes('profile') || u.skillrackUrl.includes('resume'))
-      );
-      if (eligibleStudents.length === 0) return;
-
-      setSkillrackSyncStatus({ 
-        isSyncing: true, 
-        current: 0, 
-        total: eligibleStudents.length, 
-        message: 'Auto-syncing live SkillRack data...' 
-      });
-
-      const updatedUsers = [...currentUsers];
-
-      for (let i = 0; i < eligibleStudents.length; i++) {
-        const student = eligibleStudents[i];
-        setSkillrackSyncStatus({ 
-          isSyncing: true, 
-          current: i + 1, 
-          total: eligibleStudents.length, 
-          message: `Auto-syncing ${student.name}...` 
-        });
-
-        try {
-          const encoded = encodeURIComponent(student.skillrackUrl);
-          let liveData = null;
-
-          const isValidData = (d) => d && typeof d === 'object' && !d.error && typeof d.skillrackPoints === 'number' && d.skillrackPoints >= 0;
-
-          // 1. Try /api/skillrack/scrape (handled by Vite middleware or Netlify rewrite)
-          try {
-            const res1 = await axios.get(`/api/skillrack/scrape?url=${encoded}`, { timeout: 8000 });
-            if (isValidData(res1.data)) liveData = res1.data;
-          } catch (e1) {}
-
-          // 2. Try Netlify Functions endpoint (on Netlify deployments)
-          if (!liveData) {
-            try {
-              const res0 = await axios.get(`/.netlify/functions/scrape?url=${encoded}`, { timeout: 8000 });
-              if (isValidData(res0.data)) liveData = res0.data;
-            } catch (e0) {}
-          }
-
-          // 3. Fallback to local proxy on port 5001
-          if (!liveData) {
-            try {
-              const res3 = await axios.get(`http://localhost:5001/scrape?url=${encoded}`, { timeout: 6000 });
-              if (isValidData(res3.data)) liveData = res3.data;
-            } catch (e3) {}
-          }
-
-          // 4. Reliable dataset fallback (if cloud functions get blocked by Cloudflare 403 on Netlify)
-          if (!liveData) {
-            const fallbackStudent = students.find(s => s.username === student.username) || jsonStudentsMap[student.username];
-            if (fallbackStudent && fallbackStudent.skillrackPoints !== undefined) {
-              liveData = {
-                codeTutor: fallbackStudent.codeTutor || 0,
-                codeTracks: fallbackStudent.codeTracks || 0,
-                dailyChallenge: fallbackStudent.dailyChallenge || 0,
-                dailyTest: fallbackStudent.dailyTest || 0,
-                codeTests: fallbackStudent.codeTests || 0,
-                skillrackPoints: fallbackStudent.skillrackPoints || 0
-              };
-            }
-          }
-
-          if (liveData) {
-            const userIdx = updatedUsers.findIndex(u => u.username === student.username);
-            if (userIdx !== -1) {
-              const points = liveData.skillrackPoints !== undefined ? liveData.skillrackPoints :
-                             (((liveData.codeTracks || 0) * 2) + ((liveData.dailyChallenge || 0) * 2) + ((liveData.dailyTest || 0) * 20) + ((liveData.codeTests || 0) * 30));
-              updatedUsers[userIdx] = { 
-                ...updatedUsers[userIdx], 
-                ...liveData,
-                skillrackPoints: points
-              };
-              setUsersData([...updatedUsers]);
-              try {
-                localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
-              } catch (e) {}
-            }
-          }
-        } catch (err) {
-          console.warn(`Live sync error for ${student.name}:`, err.message);
-        }
-
-        await new Promise(r => setTimeout(r, 60));
-      }
-
-      setSkillrackSyncStatus({ 
-        isSyncing: false, 
-        current: eligibleStudents.length, 
-        total: eligibleStudents.length, 
-        message: 'Live Synced' 
-      });
-
-      // Cache to localStorage
-      try {
-        localStorage.setItem('skillrack_cached_students', JSON.stringify(updatedUsers));
-        localStorage.setItem('skillrack_last_synced', new Date().toISOString());
-      } catch (e) {}
-
-      // Auto-save to sampleData.js if server is reachable
-      try {
-        await axios.post('/api/skillrack/update-students', { students: updatedUsers });
-      } catch (e) {
-        try {
-          await axios.post('http://localhost:5001/update-students', { students: updatedUsers });
-        } catch (e2) {}
       }
     };
 
@@ -313,12 +205,7 @@ const App = () => {
             <Route path="/skillrack" element={
               <SkillRackStats 
                 users={usersData} 
-                syncStatus={skillrackSyncStatus}
-                isSyncing={skillrackSyncStatus.isSyncing}
-                onUsersUpdated={(updated) => setUsersData(prev => prev.map(u => {
-                  const m = updated.find(s => s.username === u.username);
-                  return m ? { ...u, ...m } : u;
-                }))}
+                lastUpdated={lastUpdated}
               />
             } />
             <Route path="/leaderboard" element={

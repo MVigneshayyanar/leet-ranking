@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Globe } from 'lucide-react';
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxtpJ-JWXW48nUSPd8w3EvoiPCtKUq9ma6MEMSaVOKSJY5sPD-FtJwSb8nbdCyOKq5wA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZ0u7j1eLPE_6r1QBFJLERfxMKFEeTBRQ8P2q6P2Rba0nHrm6ioTFLvJpPnHMK4miMfQ/exec";
 
 const SkillRackStats = () => {
   const [iframeLoading, setIframeLoading] = useState(true);

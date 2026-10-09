@@ -12,6 +12,7 @@ const DashboardStats = ({
   onSelectBatch,
   batches = [],
   counts = {},
+  isLoadingBatch = false,
   onOpenManageModal
 }) => {
   const navigate = useNavigate();
@@ -194,10 +195,6 @@ const DashboardStats = ({
             <Download size={13} />
             <span>Export</span>
           </button>
-          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] sm:text-xs font-medium border border-emerald-500/20 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Live
-          </span>
         </div>
       </div>
 

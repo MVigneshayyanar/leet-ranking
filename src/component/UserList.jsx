@@ -30,6 +30,7 @@ const UserList = ({
   onSelectBatch,
   batches = [],
   counts = {},
+  isLoadingBatch = false,
   onOpenManageModal
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -104,7 +105,12 @@ const UserList = ({
       </div>
 
       <div className="p-3 sm:p-5 md:p-6">
-        {sortedUsers.length === 0 ? (
+        {isLoadingBatch && sortedUsers.length === 0 ? (
+          <div className="text-center py-16 flex flex-col items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin mb-3"></div>
+            <p className="text-slate-400 text-sm animate-pulse">Loading {currentBatchObj.name} students...</p>
+          </div>
+        ) : sortedUsers.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400 text-base">No students found matching your criteria.</p>
           </div>

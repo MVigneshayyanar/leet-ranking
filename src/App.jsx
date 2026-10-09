@@ -52,16 +52,21 @@ const chunkArray = (arr, size) => {
 };
 
 const App = () => {
-  const [usersData, setUsersData] = useState([]);
+  const [usersMap, setUsersMap] = useState({});
+  const [loadedBatches, setLoadedBatches] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [loadingBatch, setLoadingBatch] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  // Selected batch state
+
+  // Selected batch state - defaults to the very first batch in the list (e.g. batch-2030)
+  const defaultInitialBatch = defaultBatches[0]?.id || "batch-2030";
+
   const normalizeBatch = (b) => {
-    if (!b) return "batch-2028";
+    if (!b) return defaultInitialBatch;
     if (b === "2023-2028") return "batch-2028";
     if (b === "2024-2029") return "batch-2029";
     if (b === "2022-2027") return "batch-2027";
@@ -70,7 +75,8 @@ const App = () => {
 
   const [selectedBatch, setSelectedBatch] = useState(() => {
     const saved = localStorage.getItem("selected_batch");
-    if (!saved || saved === "2023-2028" || saved === "batch-2029" || saved === "2024-2029") return "batch-2028";
+    if (!saved || saved === "batch-2029" || saved === "2024-2029") return defaultInitialBatch;
+    if (saved === "2023-2028") return "batch-2028";
     if (saved === "2022-2027") return "batch-2027";
     return saved;
   });
@@ -88,14 +94,40 @@ const App = () => {
     return map;
   }, [allStudents]);
 
-  const handleSelectBatch = useCallback((batchId) => {
-    setSelectedBatch(batchId);
-    localStorage.setItem("selected_batch", batchId);
-  }, []);
+  // Convert usersMap to array for backwards compatibility
+  const usersData = useMemo(() => Object.values(usersMap), [usersMap]);
 
-  // Fetch LeetCode and SkillRack user data
-  const fetchUserData = useCallback(async (forceRefresh = false) => {
+  // Compute student count per batch directly from static list
+  const batchCounts = useMemo(() => {
+    const counts = { all: allStudents.length };
+    allStudents.forEach(s => {
+      const b = normalizeBatch(s.batch);
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    return counts;
+  }, [allStudents]);
+
+  // Fetch LeetCode and SkillRack user data for a specific batch or 'all'
+  const fetchBatchData = useCallback(async (batchToFetch, forceRefresh = false) => {
+    // Determine which usernames need to be fetched
+    let targetStudents = [];
+    if (batchToFetch === 'all') {
+      targetStudents = allStudents;
+    } else {
+      targetStudents = allStudents.filter(s => normalizeBatch(s.batch) === batchToFetch);
+    }
+
+    if (targetStudents.length === 0) {
+      setLoading(false);
+      return;
+    }
+
     setError("");
+    if (Object.keys(usersMap).length === 0) {
+      setLoading(true);
+    } else {
+      setLoadingBatch(true);
+    }
     if (forceRefresh) setIsRefreshing(true);
 
     try {
@@ -135,7 +167,7 @@ const App = () => {
         }
       } catch (e) {}
 
-      const skillrackMap = allStudents.reduce((acc, s) => {
+      const skillrackMap = targetStudents.reduce((acc, s) => {
         if (s.username) {
           const cached = cachedStudentsMap[s.username];
           const cdn = jsonStudentsMap[s.username];
@@ -155,9 +187,10 @@ const App = () => {
       }, {});
 
       // 3. Process LeetCode profiles with chunking and caching
-      const fetchStudentProfile = async (username) => {
-        const studentBatch = normalizeBatch(studentBatchMap[username] || skillrackMap[username]?.batch);
-        const studentName = allUserNamesMap[username] || username;
+      const fetchStudentProfile = async (s) => {
+        const username = s.username;
+        const studentBatch = normalizeBatch(s.batch || studentBatchMap[username]);
+        const studentName = allUserNamesMap[username] || s.name || username;
 
         if (!forceRefresh) {
           const cachedData = getCachedProfile(username);
@@ -261,43 +294,56 @@ const App = () => {
         }
       };
 
-      // Fetch in batches of 12 for optimal concurrency and no rate-limits
-      const chunks = chunkArray(allUsernames, 12);
-      const results = [];
-      for (const chunk of chunks) {
-        const chunkResults = await Promise.all(chunk.map(u => fetchStudentProfile(u)));
-        results.push(...chunkResults);
+      // Filter out users that are already fetched unless forceRefresh
+      const toFetchList = forceRefresh
+        ? targetStudents
+        : targetStudents.filter(s => !usersMap[s.username]);
+
+      let newResults = [];
+      if (toFetchList.length > 0) {
+        // Fetch in batches of 12 for optimal concurrency and no rate-limits
+        const chunks = chunkArray(toFetchList, 12);
+        for (const chunk of chunks) {
+          const chunkResults = await Promise.all(chunk.map(s => fetchStudentProfile(s)));
+          newResults.push(...chunkResults);
+        }
       }
 
-      setUsersData(results);
+      setUsersMap(prev => {
+        const next = { ...prev };
+        newResults.forEach(u => {
+          next[u.username] = u;
+        });
+        return next;
+      });
+
+      setLoadedBatches(prev => new Set([...prev, batchToFetch]));
       setLoading(false);
+      setLoadingBatch(false);
       setIsRefreshing(false);
     } catch (err) {
       setError(err.message || "An error occurred while fetching data.");
       setLoading(false);
+      setLoadingBatch(false);
       setIsRefreshing(false);
     }
-  }, [allStudents, allUsernames, allUserNamesMap, studentBatchMap]);
+  }, [allStudents, allUserNamesMap, studentBatchMap, usersMap]);
 
+  // Load the selected batch immediately when it changes or on mount
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    fetchBatchData(selectedBatch);
+  }, [selectedBatch]);
+
+  const handleSelectBatch = useCallback((batchId) => {
+    setSelectedBatch(batchId);
+    localStorage.setItem("selected_batch", batchId);
+  }, []);
 
   // Compute filtered users based on selected batch
   const activeUsers = useMemo(() => {
     if (selectedBatch === "all") return usersData;
     return usersData.filter(u => normalizeBatch(u.batch) === selectedBatch);
   }, [usersData, selectedBatch]);
-
-  // Compute student count per batch
-  const batchCounts = useMemo(() => {
-    const counts = { all: usersData.length };
-    usersData.forEach(u => {
-      const b = normalizeBatch(u.batch);
-      counts[b] = (counts[b] || 0) + 1;
-    });
-    return counts;
-  }, [usersData]);
 
   const LoadingScreen = () => (
     <div className="flex flex-col justify-center items-center h-full min-h-[60vh]">
@@ -312,7 +358,7 @@ const App = () => {
         <p className="text-xl text-red-400 font-semibold mb-2">Oops!</p>
         <p className="text-gray-300 mb-4">{message}</p>
         <button
-          onClick={() => fetchUserData(true)}
+          onClick={() => fetchBatchData(selectedBatch, true)}
           className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm font-semibold transition-colors cursor-pointer"
         >
           Try Again
@@ -373,6 +419,7 @@ const App = () => {
                   onSelectBatch={handleSelectBatch}
                   batches={allBatches}
                   counts={batchCounts}
+                  isLoadingBatch={loadingBatch}
                 />
               } 
             />
@@ -396,6 +443,7 @@ const App = () => {
                     onSelectBatch={handleSelectBatch}
                     batches={allBatches}
                     counts={batchCounts}
+                    isLoadingBatch={loadingBatch}
                   />
                 </div>
               } 

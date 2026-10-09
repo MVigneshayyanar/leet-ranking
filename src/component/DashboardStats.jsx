@@ -135,23 +135,23 @@ const DashboardStats = ({
   ];
 
   const StatCard = ({ title, value, subtitle, icon: Icon, color, trend }) => (
-    <div className="relative overflow-hidden bg-slate-800/40 backdrop-blur-md border border-slate-700/50 p-3 sm:p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-start justify-between group hover:border-slate-500/50 hover:bg-slate-800/60 transition-all duration-300 shadow-md">
+    <div className="relative overflow-hidden bg-slate-800/40 backdrop-blur-md border border-slate-700/50 p-3 sm:p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-start justify-between group hover:border-slate-500/50 hover:bg-slate-800/60 transition-all duration-300 shadow-md md:shadow-lg">
       {/* Background gradient blob */}
-      <div className={`absolute -right-6 -top-6 w-24 h-24 sm:w-32 sm:h-32 ${color.replace('text-', 'bg-')} bg-opacity-5 rounded-full blur-2xl sm:blur-3xl group-hover:bg-opacity-10 transition-all`}></div>
+      <div className={`absolute -right-6 -top-6 w-24 h-24 md:w-32 md:h-32 ${color.replace('text-', 'bg-')} bg-opacity-5 rounded-full blur-2xl md:blur-3xl group-hover:bg-opacity-10 transition-all`}></div>
 
       <div className="relative z-10 w-full min-w-0">
-        <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-          <div className={`p-1.5 sm:p-2 rounded-lg ${color} bg-opacity-10 shrink-0`}>
-            <Icon className={color.replace('bg-', 'text-')} size={15} />
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 md:mb-2">
+          <div className={`p-1.5 md:p-2 rounded-lg ${color} bg-opacity-10 shrink-0`}>
+            <Icon className={color.replace('bg-', 'text-')} size={18} />
           </div>
           <p className="text-slate-400 text-[11px] sm:text-xs md:text-sm font-semibold tracking-wide uppercase truncate">{title}</p>
         </div>
 
-        <div className="flex items-baseline gap-1.5 flex-wrap">
+        <div className="flex items-baseline gap-2 flex-wrap">
           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">{value}</h3>
-          {trend && <span className="text-[10px] sm:text-xs font-medium text-emerald-400 flex items-center">{trend} <ArrowUpRight size={11} /></span>}
+          {trend && <span className="text-[10px] md:text-xs font-medium text-emerald-400 flex items-center">{trend} <ArrowUpRight size={12} /></span>}
         </div>
-        {subtitle && <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate hidden sm:block">{subtitle}</p>}
+        {subtitle && <p className="text-[10px] sm:text-xs text-slate-500 mt-1 truncate hidden sm:block">{subtitle}</p>}
       </div>
     </div>
   );
@@ -190,10 +190,10 @@ const DashboardStats = ({
           )}
           <button
             onClick={() => exportToExcel(users)}
-            className="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold border border-blue-500/20 hover:bg-blue-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-3.5 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold border border-blue-500/20 hover:bg-blue-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
           >
-            <Download size={13} />
-            <span>Export</span>
+            <Download size={14} />
+            <span>Export Report</span>
           </button>
         </div>
       </div>
@@ -201,14 +201,14 @@ const DashboardStats = ({
       {/* KPI Section - 2 columns on mobile, 4 on desktop */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
         <StatCard
-          title="Students"
+          title="Active Students"
           value={totalStudents}
           icon={Users}
           color="text-blue-400"
           trend="+100%"
         />
         <StatCard
-          title="Solved"
+          title="Problems Solved"
           value={totalSolved.toLocaleString()}
           subtitle="Collective batch effort"
           icon={CheckCircle}
@@ -216,13 +216,13 @@ const DashboardStats = ({
           trend="Increasing"
         />
         <StatCard
-          title="Avg / Student"
+          title="Avg Per Student"
           value={avgSolved}
           icon={Target}
           color="text-purple-400"
         />
         <StatCard
-          title="Top 10% Cutoff"
+          title="Elite Threshold"
           value={top10Users.length > 0 ? top10Users[top10Users.length - 1].solved : 0}
           subtitle="Top 10% entry requirement"
           icon={Trophy}
@@ -241,21 +241,21 @@ const DashboardStats = ({
           {/* Charts Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
             {/* Comparison Chart */}
-            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl md:rounded-3xl p-4 sm:p-6">
-              <div className="mb-3 sm:mb-6">
-                <h3 className="text-base sm:text-lg font-bold text-white">Performance Gap</h3>
-                <p className="text-xs sm:text-sm text-slate-400">Average vs Top 10%</p>
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
+              <div className="mb-3 md:mb-6">
+                <h3 className="text-base md:text-lg font-bold text-white">Performance Gap</h3>
+                <p className="text-xs md:text-sm text-slate-400">Average vs Top 10%</p>
               </div>
-              <div className="h-52 sm:h-64 w-full">
+              <div className="h-52 md:h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={comparisonData}>
-                    <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                    <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       cursor={{ fill: '#334155', opacity: 0.2 }}
                       contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontSize: '12px' }}
                     />
-                    <Bar dataKey="solved" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={36}>
+                    <Bar dataKey="solved" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={40}>
                       {comparisonData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={index === 0 ? '#64748b' : '#3b82f6'} />
                       ))}
@@ -266,16 +266,16 @@ const DashboardStats = ({
             </div>
 
             {/* Difficulty Chart */}
-            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl md:rounded-3xl p-4 sm:p-6">
-              <div className="mb-3 sm:mb-6">
-                <h3 className="text-base sm:text-lg font-bold text-white">Difficulty Split</h3>
-                <p className="text-xs sm:text-sm text-slate-400">Problem distribution</p>
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
+              <div className="mb-3 md:mb-6">
+                <h3 className="text-base md:text-lg font-bold text-white">Difficulty Split</h3>
+                <p className="text-xs md:text-sm text-slate-400">Problem distribution</p>
               </div>
-              <div className="h-52 sm:h-64 w-full relative">
+              <div className="h-56 md:h-64 w-full relative">
                 {/* Center Text overlay for Donut */}
                 <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                  <span className="text-xl sm:text-3xl font-bold text-white">{totalSolved.toLocaleString()}</span>
-                  <span className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">Total</span>
+                  <span className="text-2xl md:text-3xl font-bold text-white">{totalSolved.toLocaleString()}</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">Total</span>
                 </div>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -283,8 +283,8 @@ const DashboardStats = ({
                       data={difficultyData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={55}
-                      outerRadius={75}
+                      innerRadius={window.innerWidth < 768 ? 58 : 70}
+                      outerRadius={window.innerWidth < 768 ? 78 : 90}
                       paddingAngle={4}
                       dataKey="value"
                       stroke="none"
@@ -301,10 +301,10 @@ const DashboardStats = ({
                 </ResponsiveContainer>
               </div>
               {/* Custom Legend */}
-              <div className="flex justify-center gap-3 sm:gap-4 mt-2">
+              <div className="flex justify-center gap-4 mt-2">
                 {difficultyData.map((d, i) => (
-                  <div key={d.name} className="flex items-center gap-1.5 text-xs text-slate-400">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i] }}></div>
+                  <div key={d.name} className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i] }}></div>
                     {d.name}
                   </div>
                 ))}

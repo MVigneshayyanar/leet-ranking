@@ -1,16 +1,21 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Trophy, GraduationCap, X, MessageCircle, Brain, Crown, ChevronLeft, ChevronRight, Swords, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Trophy, GraduationCap, X, MessageCircle, Brain, Crown, Swords, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import DailyProblem from './DailyProblem';
 
-const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
+const Sidebar = ({
+  isOpen,
+  onClose,
+  isCollapsed,
+  toggleCollapse
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
+    { id: 'leaderboard', label: 'LeetCode', icon: Trophy, path: '/leaderboard' },
     { id: 'skillrack', label: 'SkillRack Tracker', icon: BarChart3, path: '/skillrack' },
     { id: 'tournaments', label: 'Tournaments', icon: Swords, path: '/tournaments' },
     { id: 'league-heads', label: 'League Heads', icon: Crown, path: '/league-heads' },
@@ -18,7 +23,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
   ];
 
   const bottomItems = [
-    { id: 'leetcoder', label: 'LeetCode', icon: GraduationCap, url: 'https://leetcode.com' },
+    { id: 'leetcoder', label: 'LeetCode.com', icon: GraduationCap, url: 'https://leetcode.com' },
     { id: 'discord', label: 'Join Discord', icon: MessageCircle, url: 'https://discord.gg/ejCkm4RF' },
   ];
 
@@ -34,19 +39,23 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, toggleCollapse }) => {
         {/* Logo and Close Button */}
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} h-20`}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-lg">L</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-700 flex items-center justify-center text-slate-950 font-black text-xl shrink-0 shadow-lg shadow-amber-500/30 border border-yellow-200/60 ring-2 ring-amber-400/20">
+              <span className="drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]">5</span>
             </div>
             {!isCollapsed && (
               <div className="overflow-hidden whitespace-nowrap">
-                <h1 className="text-white font-bold text-lg tracking-tight">LeetRank</h1>
-                <p className="text-slate-400 text-xs">M.Tech 2028</p>
+                <h1 className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent font-extrabold text-base tracking-tight leading-tight drop-shadow-[0_1px_8px_rgba(245,158,11,0.25)]">
+                  M.TECH. CSE
+                </h1>
+                <p className="bg-gradient-to-r from-yellow-300 to-amber-400 bg-clip-text text-transparent text-xs font-semibold tracking-wide">
+                  Coding platforms
+                </p>
               </div>
             )}
           </div>
           <button 
             onClick={onClose}
-            className="md:hidden text-slate-400 hover:text-white transition-colors"
+            className="md:hidden text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X size={24} />
           </button>

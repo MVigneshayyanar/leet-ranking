@@ -20,12 +20,15 @@ export const exportToExcel = (users) => {
     return {
       Name: user.name,
       Username: user.username,
+      Batch: user.batch ? (user.batch.includes('2028') ? 'Batch 2028' : (user.batch.match(/\d+/) ? `Batch ${user.batch.match(/\d+/)[0]}` : user.batch)) : "Batch 2028",
+      "College ID": user.collegeId || "N/A",
       Rank: typeof user.rank === "number" ? user.rank : "N/A",
       "Total Solved": user.solved || 0,
       "Weekly Solved": weeklySolved,
       Easy: user.easy || 0,
       Medium: user.medium || 0,
       Hard: user.hard || 0,
+      "SkillRack Points": user.skillrackPoints || 0,
       "Profile Link": `https://leetcode.com/${user.username}/`,
     };
   });

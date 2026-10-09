@@ -101,22 +101,22 @@ const LeagueHeads = () => {
     }
 
     return (
-        <div className="p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto pb-24">
+        <div className="p-3 sm:p-6 md:p-8 space-y-4 sm:space-y-6 md:space-y-8 max-w-[1600px] mx-auto pb-24 pt-14 md:pt-8">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-2xl bg-yellow-500/10 text-yellow-500 shrink-0">
-                        <Crown size={32} />
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-yellow-500/10 text-yellow-500 shrink-0">
+                        <Crown size={26} />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-white">League Heads</h1>
-                        <p className="text-slate-400">Top performers based on recent submission scores.</p>
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">League Heads</h1>
+                        <p className="text-xs sm:text-sm text-slate-400">Top performers based on recent submission scores.</p>
                     </div>
                 </div>
             </div>
 
             {/* Leaderboard */}
-            <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl sm:rounded-2xl overflow-hidden backdrop-blur-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>

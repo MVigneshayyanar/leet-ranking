@@ -7,8 +7,39 @@ import { usernames, userNamesMap } from '../data/sampleData';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import TutorPDFDocument from './TutorPDFDocument';
 
-const AITutor = () => {
-  const [selectedUser, setSelectedUser] = useState(usernames[0]);
+const AITutor = ({
+  users = [],
+  allUsers = [],
+  selectedBatch = '2023-2028',
+  batches = []
+}) => {
+  const [activeBatchFilter, setActiveBatchFilter] = useState(selectedBatch);
+
+  // Sync batch filter if prop changes
+  useEffect(() => {
+    setActiveBatchFilter(selectedBatch);
+  }, [selectedBatch]);
+
+  const displayUsers = React.useMemo(() => {
+    const dataset = allUsers.length > 0 ? allUsers : users;
+    if (dataset.length === 0) {
+      return usernames.map(u => ({ username: u, name: userNamesMap[u] || u, batch: '2023-2028' }));
+    }
+    if (activeBatchFilter === 'all') return dataset;
+    return dataset.filter(u => (u.batch || '2023-2028') === activeBatchFilter);
+  }, [allUsers, users, activeBatchFilter]);
+
+  const [selectedUser, setSelectedUser] = useState(() => {
+    return displayUsers[0]?.username || usernames[0];
+  });
+
+  // Keep selectedUser valid if batch changes
+  useEffect(() => {
+    if (displayUsers.length > 0 && !displayUsers.some(u => u.username === selectedUser)) {
+      setSelectedUser(displayUsers[0].username);
+    }
+  }, [displayUsers, selectedUser]);
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -49,32 +80,45 @@ const AITutor = () => {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto pb-24">
+    <div className="p-3 sm:p-6 md:p-8 space-y-4 sm:space-y-6 md:space-y-8 max-w-[1600px] mx-auto pb-24 pt-14 md:pt-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 shrink-0">
-            <Bot size={32} />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto">
+          <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-indigo-500/10 text-indigo-400 shrink-0">
+            <Bot size={26} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">AI DSA Tutor</h1>
-            <p className="text-slate-400 text-sm md:text-base">Personalized roadmap and analysis based on your LeetCode performance.</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">AI DSA Tutor</h1>
+            <p className="text-xs sm:text-sm text-slate-400">Personalized roadmap and analysis based on your LeetCode performance.</p>
           </div>
         </div>
 
-        {/* User Selection */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-800/50 p-2 rounded-xl border border-slate-700/50 w-full md:w-auto">
+        {/* User Selection & Batch Filter */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-800/50 p-2 rounded-2xl border border-slate-700/50 w-full md:w-auto">
+            {batches.length > 0 && (
+              <select
+                value={activeBatchFilter}
+                onChange={(e) => setActiveBatchFilter(e.target.value)}
+                className="bg-slate-900 text-slate-300 text-xs font-semibold rounded-xl px-3 py-2 border border-slate-700 outline-none cursor-pointer"
+                disabled={loading}
+              >
+                <option value="all">All Batches</option>
+                {batches.map(b => (
+                  <option key={b.id} value={b.id}>{b.shortName || b.name}</option>
+                ))}
+              </select>
+            )}
             <div className="flex items-center flex-1 min-w-0">
-                <User className="text-slate-400 ml-2 shrink-0" size={20} />
+                <User className="text-slate-400 ml-2 shrink-0" size={18} />
                 <select 
                     value={selectedUser} 
                     onChange={(e) => setSelectedUser(e.target.value)}
-                    className="bg-transparent text-white border-none outline-none py-2 px-2 w-full text-ellipsis"
+                    className="bg-transparent text-white border-none outline-none py-2 px-2 w-full text-ellipsis text-sm cursor-pointer"
                     disabled={loading}
                 >
-                    {usernames.map(u => (
-                        <option key={u} value={u} className="bg-slate-900 text-slate-200">
-                            {userNamesMap[u] || u}
+                    {displayUsers.map(u => (
+                        <option key={u.username} value={u.username} className="bg-slate-900 text-slate-200">
+                            {u.name || userNamesMap[u.username] || u.username} (@{u.username})
                         </option>
                     ))}
                 </select>
@@ -82,7 +126,7 @@ const AITutor = () => {
             <button 
                 onClick={generateAnalysis}
                 disabled={loading}
-                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
+                className={`px-4 py-2 rounded-xl font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
                     loading 
                     ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
                     : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'

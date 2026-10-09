@@ -1,85 +1,56 @@
-export const usernames = [
-    "abinayagopalakrishnan",
-    "Abul_Hussain_A",
-    "Balaji2123",
-    "n8SRk2xrw9",
-    "GOPIKA646",
-    "kaviya_3467",
-    "kaviyapriya_v",
-    "Kavyadharshini-S-M",
-    "Madhumithaa_RM7",
-    "Maga_M",
-    "HbinzzV7VQ",
-    "Rohin_2125",
-    "naveensasikumar1503",
-    "Nira_26",
-    "nithyavarshini_A",
-    "Phargavi_S",
-    "Resh_03",
-    "s_mridula",
-    "mdSE3YJBKr",
-    "saravanankumaresan",
-    "0VdnSCNwLZ",
-    "Sow_miya_r",
-    "dragoon123",
-    "S_U_J_A_N",
-    "tharani_2101",
-    "Udheshkumar1536",
-    "ugapriya",
-    "Vasanthan__7",
-    "VIDULA666", // Placeholder for generic problemset link
-    "vigneshinr",
-    "saai_shrinidhi_s_v",
-    "JANARTHANAN_H",
-    "Saivarsha_A",
-    "Rajalakshmi_25",
-    "sandhiyarajesh",
-    "yuva_shakthi",
-    "Dharanesh29",
-    "jayaganth_7",
-    "Poojasree_S12",
-    "harini_harini",
-    "OiS37olExO",
-    "HARISH_G007",
-    "nithish_sk",
-    "Satheeswari_",
-    "LeelaPercy",
-    "aiku4",
-    "sec23cj042",
-    
-    "karthik_jayaram_sk", // Placeholder for profile/account link
-    "selvapriya2104",
-    "mathewEmmanuel",
-    "Jebastin_preethi",
-    "poojapoonkodi",
-    "SHREEHARSHINIvk",
-    "dark_web11",
-    "ashnova07",
-    "Gowtham_tf"
-];
+/**
+ * LeetRank - Multi-Batch Student Directory
+ *
+ * Simple schema requested by user:
+ * Each batch is defined as:
+ *   "batch-<year>": {
+ *     "leetcode_username": "Student Name"
+ *   }
+ *
+ * To add an upcoming batch (e.g. batch-2030), simply add a new key below!
+ */
 
-export const userNamesMap = {
+export const batchesData = {
+  "batch-2028": {
     "abinayagopalakrishnan": "Abinaya G",
     "Abul_Hussain_A": "Abul Hussain A",
     "Balaji2123": "BALAJI R",
     "n8SRk2xrw9": "Bhuvan S",
+    "Dharanesh29": "Dharaneshwaran R",
     "GOPIKA646": "Gopika S",
+    "JANARTHANAN_H": "H.JANARTHANAN",
+    "harini_harini": "Harini.R",
+    "HARISH_G007": "HARISH G",
+    "jayaganth_7": "Jayaganth J",
+    "karthik_jayaram_sk": "Karthik Jayaram S K",
+    "aiku4": "Kavin Kannan K",
     "kaviya_3467": "KAVIYA K",
     "kaviyapriya_v": "Kaviya Priya V",
     "Kavyadharshini-S-M": "Kavyadharshini S M",
     "Madhumithaa_RM7": "Madhumithaa R M",
     "Maga_M": "Maga M",
     "HbinzzV7VQ": "Manoj Kumar R",
+    "mathewEmmanuel": "Mathew Emmanuel A",
     "Rohin_2125": "MICHAEL ROHIN D A",
+    "sec23cj042": "Mugilan A",
     "naveensasikumar1503": "NAVEEN S",
     "Nira_26": "NIRANJANA J",
     "nithyavarshini_A": "Nithya varshini A",
     "Phargavi_S": "Phargavi S",
+    "LeelaPercy": "Pon.S.Leela Percy",
+    "Poojasree_S12": "Poojasree S",
+    "Rajalakshmi_25": "Rajalakshmi.R",
     "Resh_03": "Reshma N",
     "s_mridula": "S Mridula",
+    "saai_shrinidhi_s_v": "Saai Shrindhi S V",
+    "Saivarsha_A": "Saivarsha A",
+    "sandhiyarajesh": "SANDHIYA R",
     "mdSE3YJBKr": "SANJAY S",
     "saravanankumaresan": "SARAVANAN S",
+    "Satheeswari_": "Satheeswari R",
+    "selvapriya2104": "Selvapriya S",
     "0VdnSCNwLZ": "Shakthi Akshata G",
+    "nithish_sk": "Sk NITHISH",
     "Sow_miya_r": "SOWMIYA R",
     "dragoon123": "SRIRAM M",
     "S_U_J_A_N": "SUJAN P",
@@ -88,90 +59,284 @@ export const userNamesMap = {
     "ugapriya": "UGAPRIYA S",
     "Vasanthan__7": "VASANTHAN M",
     "VIDULA666": "Vidula.G",
-    "vigneshinr": "VIGNESHAYYANAR M",
-    "saai_shrinidhi_s_v": "Saai Shrindhi S V",
-    "JANARTHANAN_H": "H.JANARTHANAN",
-    "Saivarsha_A": "Saivarsha A",
-    "Rajalakshmi_25": "Rajalakshmi.R",
-    "sandhiyarajesh": "SANDHIYA R",
-    "yuva_shakthi": "yuvashakthi",
-    "Dharanesh29": "Dharaneshwaran R",
-    "jayaganth_7": "Jayaganth J",
-    "Poojasree_S12": "Poojasree S",
-    "harini_harini": "Harini.R",
     "OiS37olExO": "VIGNESH S",
-    "HARISH_G007": "HARISH G",
-    "nithish_sk": "Sk NITHISH",
-    "Satheeswari_": "Satheeswari R",
-    "LeelaPercy": "Pon.S.Leela Percy",
-    "aiku4": "Kavin Kannan K",
-    "sec23cj042": "Mugilan A",
-    "karthik_jayaram_sk": "Karthik Jayaram S K",
-    "selvapriya2104": "Selvapriya S",
-    "mathewEmmanuel": "Mathew Emmanuel A",
+    "vigneshinr": "VIGNESHAYYANAR M",
+    "yuva_shakthi": "yuvashakthi",
     "Jebastin_preethi": "Jebastin preethi J",
     "poojapoonkodi": "Pooja@Poonkodi",
     "SHREEHARSHINIvk": "SHREEHARSHINI VK",
     "dark_web11": "Bhuvanesh M",
     "ashnova07": "Ashwin Annamalai Lena",
-    "Gowtham_tf": "Mupidathy Gowtham"
+    "Gowtham_tf": "MUPIDATHY GOWTHAM. T"
+  },
+  "batch-2029": {
+    "JAGATH_K_007": "jagath",
+    "Samiks_a": "samiksha",
+    "Rakshitha__2908": "rakshitha",
+    "LAKSHANA_M2005": "lakshana",
+    "mohd_sameem_10": "mohammed sameem",
+    "Niroshini2007": "niroshini",
+    "hardinisudhakar": "hardinisudhakar",
+    "Jeeva__Shree": "jeeva shree",
+    "Saiff_24": "saif ahamed sait",
+    "Ruvi_26": "ruvina",
+    "muthu_Linga_Selvi": "Muthu Linga Selvi",
+    "shruthi_E": "shruthi",
+    "Dharnish_24": "dharnish",
+    "Harieesh_Ragaw": "harieesh ragaw",
+    "Ridha_001": "ridhamitha",
+    "Sudharshanraj1186": "sudharshan raj",
+    "RajeshSec24cj023": "rajesh",
+    "Srivaishnavi_1515": "sri vaishnavi",
+    "Yaswanth1227": "yashwanth",
+    "Sakthivel106": "sakthivel",
+    "Nandhini_M_S2305": "nandhini",
+    "Lathi_58": "lathika",
+    "v-arsha321": "varsha",
+    "nsanjaysachin": "sanjay sachin",
+    "Shri_248": "shrinithi",
+    "Kaviyasree_2007": "kaviyasree",
+    "AkashM__2006": "Akash",
+    "Jayashree_0824": "Jayashree",
+    "Sandyy_": "santhosh",
+    "Tanush__05": "tanush",
+    "Keerthivasan2737": "keerthivasan",
+    "ms_2314": "malini",
+    "Raghavan_21": "sri lakshmi raghavan",
+    "THE_YUGESH": "yugesh",
+    "KISHORE_052": "kishore",
+    "Sakthi__2103": "sakthi",
+    "DHINESH29": "dhinesh kanna",
+    "Karaneh_": "karan",
+    "Rupesh_D07": "rupesh",
+    "sleepyfriend26": "gaurav natrajan",
+    "Dharshiniv0409": "Dharshini V",
+    "karthi043": "karthick raja",
+    "DineshBalaji05": "dhinesh balaji",
+    "Rishieyyy": "maha rishi",
+    "Dhanu__sri": "dhanu sri",
+    "Naresh_JK": "naresh",
+    "StackSoldier": "prathmesh mishra",
+    "Divakar_D20": "Divakar",
+    "Madhi_03": "Madhi Arasan",
+    "bSwUSSQwk3": "roshan karthick",
+    "madhan": "madhan",
+    "Surendar_10": "surrendar",
+    "gnanasowndari2006": "Gnana sowndari",
+    "RisingDrago_75": "teshwar",
+    "NehaSS8284": "Neha",
+    "vasukiii_29": "vasuki",
+    "Dharshiniganga": "Dharshini K"
+  },
+  "batch-2027": {
+    "aldous-roy": "Aldous Roy",
+    "sanjuzzz28": "Sanjay V",
+    "Ramkumar321": "Ramkumar",
+    "SaiRaghav_007": "Sai Raghav",
+    "Aframariyam1": "Afra Mariyam",
+    "YUVASHREE_R_H": "Yuvashree R H",
+    "L4mYntjZlm": "Abinaya Sri",
+    "saicharanuvi": "Saicharan U",
+    "kirithika_srini04": "Kirithika S",
+    "Jones--Martin": "Jones Martin",
+    "Krishnachoudhary005": "Krishna Choudhary",
+    "khushimilimishra": "Khushi Mili Mishra",
+    "1XjFPCdTLU": "Vigneeshwaran R",
+    "dinesh_vx": "DineshKarthik K",
+    "K6bYxRZ7TH": "Vickna Sai Kumar S.R",
+    "VIKNESH_SR": "Vignesh SR",
+    "manimaran_001": "Manimaran AK",
+    "Vigneshwar-M": "Vigneshwar M",
+    "BzEtWgd29i": "Lokesh C M",
+    "Nikesh_1926": "Nikesh",
+    "Aadithya_S_J": "Aadithya SJ",
+    "Parthiban_1509": "Parthiban",
+    "sabari1504": "Sabari",
+    "gopi_ram_gr": "Gopiram",
+    "fqlhSFKUrM": "Ashwin V",
+    "rishivel91": "Rishi Vel1",
+    "sanjayy22": "Sanjay S",
+    "LakshithaB": "Lakshitha B",
+    "raveenthulasi": "Raveen T",
+    "Anand9361": "Anand",
+    "ZeninAbhi": "Abhishek",
+    "Avinash070707": "Avinash",
+    "Hasu_mathi": "Hasu Mathi",
+    "iBz8r2bans": "Selva Vignesh",
+    "divya__ds": "Divya Sri Manimaran",
+    "SANDHIYA555": "Sandhiya",
+    "devadarshancse": "Devadarshan",
+    "geetharashni": "Geetha Rashni",
+    "sec22cj016": "Mridhula",
+    "Srinivasan-sv": "Srinivasan",
+    "Bhavya_C_23": "Bhavya C",
+    "Kdk1106": "Deva Krishnan",
+    "SARAN0209": "Saranya",
+    "Rakesh_sec22cj013": "Rakesh",
+    "VS22": "Janani",
+    "Lavanya_251104": "Lavanya",
+    "wIHnUCShlh": "Yuvan Sarathy",
+    "sivanesan0809": "Sivanesan",
+    "GrJv2CdD5P": "Raj Kumar",
+    "Tharani_15": "Tharani",
+    "Vetriselvi_03": "Vetriselvi",
+    "dw4AvrXJgz": "Akshaya",
+    "2rzN2L2nR2": "Siva Shathi",
+    "Divyadharshiny37": "Divyadharshiny",
+    "Bhavadharani_2804": "Bhavadharani",
+    "Divyadarshini_": "Divyadarshini",
+    "Shreya0503": "Shreya",
+    "koushilearns": "Koushik Babu"
+  },
+  "batch-2030": {
+    "Krishnapriya2908": "KRISHNAPRIYA S SAJU",
+    "Sri_Hariharan_R_28": "Sri Hariharan R",
+    "Roronoa_Zoro_77": "Nanthakumaar A T",
+    "PREM_KUMAR_J_67": "PREM KUMAR J",
+    "YogapriyaMeganathan": "Yogapriya M",
+    "kevin_52": "Kevin.a",
+    "SAARUMATHI_M": "SAARUMATHI M",
+    "harini-r-2025-2029": "HARINI R",
+    "SEC25CJ062": "Swetha P S",
+    "Priyanka_Anuman": "Priyanka A",
+    "sadhanavijaykumar": "Sadhana v",
+    "Preethika_venkatesan": "PREETHIKA V",
+    "Rakshana_2008": "RAKSHANA P",
+    "Padmaja_1216": "Padmaja T.P",
+    "Priyadharshini_33": "PRIYADHARSHINI M",
+    "jbjlhbsdn": "Ganesh.K",
+    "SanthoshKumar-26": "SANTHOSH KUMAR A",
+    "vedhitha_LP": "Vedhitha L P",
+    "Divyasaritha_17": "DIVYASARITHA V",
+    "SEC25CJ057": "INDHU SHREE M",
+    "Sha-1234": "Sharanya J",
+    "MelindaJanice": "Melinda Janice .A",
+    "jeya_femi": "Jeya Femi j",
+    "SEC25CJ044": "Abinaya K",
+    "kavin-c-0633": "Kavin C",
+    "BrundhaSP": "Brundha S P",
+    "tharun1803": "Tharun",
+    "Madhu_10_2007": "Madhu Mitha.S",
+    "kishoreP_2008": "KISHORE P",
+    "sec25cj015": "HARIKRISHNAN S",
+    "sec25cj052": "BUVANESHWARAN M",
+    "sec25cj006": "R D AKSHARA",
+    "sec25cj018": "KIRUBAKARAN V",
+    "sec25cj056": "VISHNUVARDHAN R",
+    "sec25cj049": "MADHAN N",
+    "sec25cj004": "PRIYANKHA M",
+    "sec25cj051": "RISHIKESH V",
+    "sec25cj001": "SAI SATHIYA S",
+    "sec25cj022": "MUKILAN P",
+    "sec25cj042": "STENIN JEFRIO S",
+    "sec25cj003": "KAMALESH M",
+    "sec25cj035": "SURESH KRISHNA P",
+    "sec25cj030": "THABEEK MOHAMED M",
+    "sec25cj010": "PALANIVEL V",
+    "sec25cj009": "PAVITHRA J",
+    "sec25cj013": "ABHENAYA VIJEYANAND",
+    "sec25cj020": "SAI RAKESH K I",
+    "sec25cj058": "MANISHA P",
+    "sec25cj048": "DIVYA DHARSHINI S",
+    "sec25cj032": "SHRI AJAYRAJ R",
+    "sec25cj034": "RUDRA V R",
+    "sec25cj038": "AKASH R",
+    "sec25cj037": "SUSMITHA R",
+    "sec25cj043": "ANUPRIYA V",
+    "sec25cj053": "KAILASH V S",
+    "sec25cj025": "RITHESH C",
+    "sec25cj007": "J KIRTHIKA SHIVANI",
+    "sec25cj039": "NARESHKRISHNA B",
+    "sec25cj012": "DINESH D",
+    "sec25cj041": "G NIGILESH",
+    "sec25cj060": "SRILEKHA S",
+    "sec25cj063": "DINESH KARTHIC R",
+    "sec25cj064": "SUGANTHAN M",
+    "SEC25CJ061": "BALAJI PRASATH P"
+  }
 };
 
-export const students = [
-  { collegeId: "SEC23CJ056", name: "Abinaya G", username: "abinayagopalakrishnan", skillrackUrl: "http://www.skillrack.com/profile/442532/d84af030848bc909479ecf331458ca0d29cb0fe7", codeTutor: 62, codeTracks: 573, dailyChallenge: 103, dailyTest: 130, codeTests: 11, skillrackPoints: 4282 },
-  { collegeId: "SEC23CJ052", name: "Abul Hussain A", username: "Abul_Hussain_A", skillrackUrl: "http://www.skillrack.com/profile/442523/09d2654cd2ceef044fa90e7a3b9c55ef42a9fbb5", codeTutor: 175, codeTracks: 1253, dailyChallenge: 97, dailyTest: 107, codeTests: 8, skillrackPoints: 5080 },
-  { collegeId: "SEC23CJ058", name: "BALAJI R", username: "Balaji2123", skillrackUrl: "https://www.skillrack.com/faces/resume.xhtml?id=442573&key=5e698a772b3098db08144c110736e031c6708ce4", codeTutor: 228, codeTracks: 1286, dailyChallenge: 359, dailyTest: 462, codeTests: 10, skillrackPoints: 12830 },
-  { collegeId: "SEC23CJ039", name: "Bhuvan S", username: "n8SRk2xrw9", skillrackUrl: "http://www.skillrack.com/profile/442546/5b6adf7210c193c3e6b228409793b80f195ecdf4", codeTutor: 223, codeTracks: 375, dailyChallenge: 0, dailyTest: 0, codeTests: 2, skillrackPoints: 810 },
-  { collegeId: "SEC23CJ019", name: "Dharaneshwaran R", username: "Dharanesh29", skillrackUrl: "http://www.skillrack.com/profile/442569/c146db6e370b413129ab490bbe6a5e378639b19", codeTutor: 0, codeTracks: 0, dailyChallenge: 0, dailyTest: 0, codeTests: 0, skillrackPoints: 0 },
-  { collegeId: "SEC23CJ043", name: "Gopika S", username: "GOPIKA646", skillrackUrl: "http://www.skillrack.com/profile/442536/e02d784c5b148eb1a0d725f5aceb024252a911f1", codeTutor: 41, codeTracks: 637, dailyChallenge: 10, dailyTest: 20, codeTests: 10, skillrackPoints: 1994 },
-  { collegeId: "SEC23CJ040", name: "H.JANARTHANAN", username: "JANARTHANAN_H", skillrackUrl: "http://www.skillrack.com/profile/442543/02addda728f51c47d7231d73e67658309baab1b6", codeTutor: 89, codeTracks: 640, dailyChallenge: 20, dailyTest: 23, codeTests: 0, skillrackPoints: 1780 },
-  { collegeId: "SEC23CJ018", name: "Harini.R", username: "harini_harini", skillrackUrl: "http://www.skillrack.com/profile/442562/198749e353fe1e318bbbdfa781633483fbf7a3d5", codeTutor: 129, codeTracks: 748, dailyChallenge: 25, dailyTest: 24, codeTests: 13, skillrackPoints: 2416 },
-  { collegeId: "SEC23CJ054", name: "HARISH G", username: "HARISH_G007", skillrackUrl: "http://www.skillrack.com/profile/442525/b86225783aa60a5001754dfe1eb261cbaa6fe6b9", codeTutor: 86, codeTracks: 515, dailyChallenge: 1, dailyTest: 1, codeTests: 8, skillrackPoints: 1292 },
-  { collegeId: "SEC23CJ031", name: "Jayaganth J", username: "jayaganth_7", skillrackUrl: "http://www.skillrack.com/profile/442553/5dfb2893797e8c5e2275077437ddb70c8c6ff92f", codeTutor: 249, codeTracks: 534, dailyChallenge: 227, dailyTest: 299, codeTests: 11, skillrackPoints: 7832 },
-  { collegeId: "SEC23CJ004", name: "Karthik Jayaram S K", username: "karthik_jayaram_sk", skillrackUrl: "http://www.skillrack.com/profile/442538/490af4e3c77e891cd7bece58e37608bed92d63b7", codeTutor: 202, codeTracks: 562, dailyChallenge: 135, dailyTest: 159, codeTests: 10, skillrackPoints: 4874 },
-  { collegeId: "SEC23CJ012", name: "Kavin Kannan K", username: "aiku4", skillrackUrl: "http://www.skillrack.com/profile/442564/e03a27b4b4946709b17995cd44d24a764a1f37d9", codeTutor: 22, codeTracks: 1033, dailyChallenge: 139, dailyTest: 125, codeTests: 13, skillrackPoints: 5234 },
-  { collegeId: "SEC23CJ027", name: "KAVIYA K", username: "kaviya_3467", skillrackUrl: "https://www.skillrack.com/profile/442560/6df6320c0d3d9326ec296a2fca2712b3f6033908", codeTutor: 63, codeTracks: 984, dailyChallenge: 246, dailyTest: 305, codeTests: 13, skillrackPoints: 8950 },
-  { collegeId: "SEC23CJ028", name: "Kaviya Priya V", username: "kaviyapriya_v", skillrackUrl: "http://www.skillrack.com/profile/442554/a89d41f0eab39b57e3ea1af4272be4846b6c2720", codeTutor: 133, codeTracks: 743, dailyChallenge: 61, dailyTest: 72, codeTests: 5, skillrackPoints: 3198 },
-  { collegeId: "SEC23CJ061", name: "Kavyadharshini S M", username: "Kavyadharshini-S-M", skillrackUrl: "http://www.skillrack.com/profile/442575/3cf126d9412efa6e7f443ae585d6db0fbf8320c8", codeTutor: 105, codeTracks: 996, dailyChallenge: 7, dailyTest: 10, codeTests: 9, skillrackPoints: 2476 },
-  { collegeId: "SEC23CJ025", name: "Madhumithaa R M", username: "Madhumithaa_RM7", skillrackUrl: "http://www.skillrack.com/profile/442559/f4e2a905395c18fa167d9c43343025190ce06b20", codeTutor: 203, codeTracks: 1017, dailyChallenge: 24, dailyTest: 29, codeTests: 12, skillrackPoints: 3022 },
-  { collegeId: "SEC23CJ026", name: "Maga M", username: "Maga_M", skillrackUrl: "http://www.skillrack.com/profile/442556/dc50447f017d839d9d09f451ef9d55e5cba0813b", codeTutor: 122, codeTracks: 914, dailyChallenge: 233, dailyTest: 239, codeTests: 13, skillrackPoints: 7464 },
-  { collegeId: "SEC23CJ035", name: "Manoj Kumar R", username: "HbinzzV7VQ", skillrackUrl: "http://www.skillrack.com/profile/442549/03bc6f3392bed28ebf9cffeac9f452dc76b271ed", codeTutor: 21, codeTracks: 916, dailyChallenge: 292, dailyTest: 314, codeTests: 12, skillrackPoints: 9056 },
-  { collegeId: "SEC23CJ016", name: "Mathew Emmanuel A", username: "mathewEmmanuel", skillrackUrl: "http://www.skillrack.com/profile/442567/15a961de57b754d0d32bfc4a39c59825c4fe1272", codeTutor: 131, codeTracks: 664, dailyChallenge: 91, dailyTest: 169, codeTests: 12, skillrackPoints: 5250 },
-  { collegeId: "SEC23CJ029", name: "MICHAEL ROHIN D A", username: "Rohin_2125", skillrackUrl: "http://www.skillrack.com/profile/442555/bba9c838e77557b1ab309e66c2a682ad35ecf9f8", codeTutor: 185, codeTracks: 913, dailyChallenge: 171, dailyTest: 209, codeTests: 13, skillrackPoints: 6738 },
-  { collegeId: "SEC23CJ042", name: "Mugilan A", username: "sec23cj042", skillrackUrl: "http://www.skillrack.com/profile/442535/bee68db41c579cb1774bbe19019278f78d8545d5", codeTutor: 130, codeTracks: 735, dailyChallenge: 27, dailyTest: 47, codeTests: 6, skillrackPoints: 2644 },
-  { collegeId: "SEC1R23CJ1", name: "NAVEEN S", username: "naveensasikumar1503", skillrackUrl: "http://www.skillrack.com/profile/404204/2d23d650b4094b9b25f25ca27c17b18971d712a4", codeTutor: 228, codeTracks: 441, dailyChallenge: 79, dailyTest: 78, codeTests: 1, skillrackPoints: 2630 },
-  { collegeId: "SEC23CJ006", name: "NIRANJANA J", username: "Nira_26", skillrackUrl: "http://www.skillrack.com/profile/442516/9307651ff3371fb39c5760e4192969cb6aad2e2d", codeTutor: 66, codeTracks: 1035, dailyChallenge: 13, dailyTest: 13, codeTests: 12, skillrackPoints: 2716 },
-  { collegeId: "SEC23CJ053", name: "Nithya varshini A", username: "nithyavarshini_A", skillrackUrl: "http://www.skillrack.com/profile/442524/70d655f18e25ebea8b0e4e5a867f47b32202eba9", codeTutor: 67, codeTracks: 882, dailyChallenge: 18, dailyTest: 37, codeTests: 7, skillrackPoints: 2750 },
-  { collegeId: "SEC23CJ038", name: "Phargavi S", username: "Phargavi_S", skillrackUrl: "http://www.skillrack.com/profile/442545/71e9f54794e55df5aca21798dd231beda2e12491", codeTutor: 75, codeTracks: 824, dailyChallenge: 66, dailyTest: 78, codeTests: 11, skillrackPoints: 3670 },
-  { collegeId: "SEC23CJ041", name: "Pon.S.Leela Percy", username: "LeelaPercy", skillrackUrl: "http://www.skillrack.com/profile/442534/217674e3be4881bfc2fd2518efa43a7bfa32752b", codeTutor: 87, codeTracks: 561, dailyChallenge: 0, dailyTest: 0, codeTests: 5, skillrackPoints: 1272 },
-  { collegeId: "SEC23CJ032", name: "Poojasree S", username: "Poojasree_S12", skillrackUrl: "http://www.skillrack.com/profile/442551/8d2cbc98b6b7770c5ac642c49feff76766f4ce3e", codeTutor: 92, codeTracks: 905, dailyChallenge: 33, dailyTest: 38, codeTests: 11, skillrackPoints: 2966 },
-  { collegeId: "SEC23CJ001", name: "Rajalakshmi.R", username: "Rajalakshmi_25", skillrackUrl: "http://www.skillrack.com/profile/442540/d289a325619c340f599ffb1c5b298a0242550f0f", codeTutor: 114, codeTracks: 980, dailyChallenge: 133, dailyTest: 151, codeTests: 10, skillrackPoints: 5546 },
-  { collegeId: "SEC23CJ014", name: "Reshma N", username: "Resh_03", skillrackUrl: "http://www.skillrack.com/profile/442565/0efe43e148e090e072212980f7bd23bf5f2834d2", codeTutor: 26, codeTracks: 824, dailyChallenge: 103, dailyTest: 121, codeTests: 12, skillrackPoints: 4634 },
-  { collegeId: "SEC23CJ034", name: "S Mridula", username: "s_mridula", skillrackUrl: "http://www.skillrack.com/profile/442548/65d42db217e131759edda597bca4482a2cea7bd4", codeTutor: 128, codeTracks: 639, dailyChallenge: 2, dailyTest: 19, codeTests: 11, skillrackPoints: 1992 },
-  { collegeId: "SEC23CJ021", name: "Saai Shrindhi S V", username: "saai_shrinidhi_s_v", skillrackUrl: "https://www.skillrack.com/profile/442570/0fcd5689200c908c975133067290d2c2e08eca69", codeTutor: 167, codeTracks: 509, dailyChallenge: 4, dailyTest: 3, codeTests: 7, skillrackPoints: 1296 },
-  { collegeId: "SEC23CJ059", name: "Saivarsha A", username: "Saivarsha_A", skillrackUrl: "https://www.skillrack.com/profile/442572/4ee4958bb923c83ec4e83f0986a8795a45167fc9", codeTutor: 110, codeTracks: 713, dailyChallenge: 28, dailyTest: 38, codeTests: 13, skillrackPoints: 2632 },
-  { collegeId: "SEC23CJ046", name: "SANDHIYA R", username: "sandhiyarajesh", skillrackUrl: "http://www.skillrack.com/profile/442528/2adcafc8a2fadc29613c774c57429ae1414b8b94", codeTutor: 34, codeTracks: 966, dailyChallenge: 262, dailyTest: 307, codeTests: 12, skillrackPoints: 8956 },
-  { collegeId: "SEC23CJ015", name: "SANJAY S", username: "mdSE3YJBKr", skillrackUrl: "http://www.skillrack.com/profile/442531/91e6affe8ebfedd9b6c2d7d35f7a1763ccee5de9", codeTutor: 2, codeTracks: 945, dailyChallenge: 185, dailyTest: 187, codeTests: 13, skillrackPoints: 6390 },
-  { collegeId: "SEC23CJ007", name: "SARAVANAN S", username: "saravanankumaresan", skillrackUrl: "https://www.skillrack.com/faces/resume.xhtml?id=442521&key=006e1305fb07c4c7ffec711cd288d8dbb7f02227", codeTutor: 58, codeTracks: 923, dailyChallenge: 290, dailyTest: 308, codeTests: 8, skillrackPoints: 8826 },
-  { collegeId: "SEC23CJ005", name: "Satheeswari R", username: "Satheeswari_", skillrackUrl: "http://www.skillrack.com/profile/442542/687dcdb4964edd0e612cfea100f77d60f8cd489e", codeTutor: 71, codeTracks: 632, dailyChallenge: 17, dailyTest: 17, codeTests: 12, skillrackPoints: 1998 },
-  { collegeId: "SEC23CJ008", name: "Selvapriya S", username: "selvapriya2104", skillrackUrl: "https://skillrack.com/faces/candidate/manageprofile.xhtml", codeTutor: 0, codeTracks: 0, dailyChallenge: 0, dailyTest: 0, codeTests: 0, skillrackPoints: 0 },
-  { collegeId: "SEC23CJ033", name: "Shakthi Akshata G", username: "0VdnSCNwLZ", skillrackUrl: "http://www.skillrack.com/profile/442547/1866cd8e27acff1fdad7ed7ceec379ceabd586ca", codeTutor: 83, codeTracks: 1183, dailyChallenge: 93, dailyTest: 98, codeTests: 13, skillrackPoints: 4902 },
-  { collegeId: "SEC23CJ047", name: "Sk NITHISH", username: "nithish_sk", skillrackUrl: "http://www.skillrack.com/profile/442529/da07a46f802367e620877b66395ce0b336af9fe1", codeTutor: 72, codeTracks: 587, dailyChallenge: 24, dailyTest: 42, codeTests: 1, skillrackPoints: 2092 },
-  { collegeId: "SEC23CJ055", name: "SOWMIYA R", username: "Sow_miya_r", skillrackUrl: "https://skillrack.com/faces/candidate/manageprofile.xhtml", codeTutor: 0, codeTracks: 0, dailyChallenge: 0, dailyTest: 0, codeTests: 0, skillrackPoints: 0 },
-  { collegeId: "SEC23CJ045", name: "SRIRAM M", username: "dragoon123", skillrackUrl: "http://www.skillrack.com/profile/442533/6d00e814eb7b717e57462a52d8929eaa7337c8b4", codeTutor: 20, codeTracks: 655, dailyChallenge: 51, dailyTest: 70, codeTests: 11, skillrackPoints: 3142 },
-  { collegeId: "SEC23CJ020", name: "SUJAN P", username: "S_U_J_A_N", skillrackUrl: "http://www.skillrack.com/profile/442568/d1725f74045b44673d55fd4d357a072b0d132397", codeTutor: 102, codeTracks: 916, dailyChallenge: 163, dailyTest: 236, codeTests: 12, skillrackPoints: 7238 },
-  { collegeId: "SEC23CJ036", name: "THARANI.P", username: "tharani_2101", skillrackUrl: "http://www.skillrack.com/profile/442550/b91b7766d491555a201aa115a71daf12d39d497e", codeTutor: 93, codeTracks: 523, dailyChallenge: 2, dailyTest: 17, codeTests: 10, skillrackPoints: 1690 },
-  { collegeId: "SEC23CJ002", name: "Udheshkumar C", username: "Udheshkumar1536", skillrackUrl: "http://www.skillrack.com/profile/442541/fd04671abe864ed8511bb2b05bb1f104aadc20d8", codeTutor: 1, codeTracks: 787, dailyChallenge: 101, dailyTest: 106, codeTests: 13, skillrackPoints: 4286 },
-  { collegeId: "SEC23CJ044", name: "UGAPRIYA S", username: "ugapriya", skillrackUrl: "http://www.skillrack.com/profile/442537/e7cee408b3b6e7f8ab739908488fd9ec92d50888", codeTutor: 112, codeTracks: 685, dailyChallenge: 33, dailyTest: 75, codeTests: 5, skillrackPoints: 3086 },
-  { collegeId: "SEC23CJ048", name: "VASANTHAN M", username: "Vasanthan__7", skillrackUrl: "http://www.skillrack.com/profile/442527/cf26ff6f3e5cd2906e546201e006890b2229bb22", codeTutor: 164, codeTracks: 1118, dailyChallenge: 185, dailyTest: 248, codeTests: 3, skillrackPoints: 7656 },
-  { collegeId: "SEC23CJ024", name: "Vidula.G", username: "VIDULA666", skillrackUrl: "http://www.skillrack.com/profile/442558/86c5d226539adcb010668b443ba642c6bdca69d3", codeTutor: 59, codeTracks: 687, dailyChallenge: 45, dailyTest: 73, codeTests: 9, skillrackPoints: 3194 },
-  { collegeId: "SEC23CJ003", name: "VIGNESH S", username: "OiS37olExO", skillrackUrl: "http://www.skillrack.com/profile/442539/982da11f1425a9e683432d67d23f41fe00971f2a", codeTutor: 55, codeTracks: 861, dailyChallenge: 63, dailyTest: 90, codeTests: 8, skillrackPoints: 3888 },
-  { collegeId: "SEC23CJ013", name: "VIGNESHAYYANAR M", username: "vigneshinr", skillrackUrl: "http://www.skillrack.com/profile/442563/4a3afc5dac8cb23ffab166f7b9da4c72678010fb", codeTutor: 147, codeTracks: 1254, dailyChallenge: 284, dailyTest: 354, codeTests: 11, skillrackPoints: 10486 },
-  { collegeId: "SEC23CJ022", name: "yuvashakthi", username: "yuva_shakthi", skillrackUrl: "http://www.skillrack.com/profile/442571/77c13212f1d71de50dd3ac1a66e942fb55428424", codeTutor: 58, codeTracks: 686, dailyChallenge: 23, dailyTest: 44, codeTests: 13, skillrackPoints: 2688 },
-  { collegeId: "SEC23CJ057", name: "Jebastin preethi J", username: "Jebastin_preethi", skillrackUrl: "https://skillrack.com/faces/ui/profile.xhtml", codeTutor: 0, codeTracks: 0, dailyChallenge: 0, dailyTest: 0, codeTests: 0, skillrackPoints: 0 },
-  { collegeId: "SEC23CJ050", name: "Pooja@Poonkodi", username: "poojapoonkodi", skillrackUrl: "http://www.skillrack.com/profile/442530/b5874905deceac3cbfa09570d7e71fa01b310386", codeTutor: 62, codeTracks: 602, dailyChallenge: 6, dailyTest: 9, codeTests: 3, skillrackPoints: 1486 },
-  { collegeId: "SEC23CJ023", name: "SHREEHARSHINI VK", username: "SHREEHARSHINIvk", skillrackUrl: "http://www.skillrack.com/profile/442557/4caac7181c763878a0d006e296a5e70ab6238b57", codeTutor: 88, codeTracks: 302, dailyChallenge: 0, dailyTest: 0, codeTests: 12, skillrackPoints: 964 },
-  { collegeId: "SEC23CJ010", name: "Bhuvanesh M", username: "dark_web11", skillrackUrl: "http://www.skillrack.com/profile/442517/29fc195f8fcd03707a168a3606eac699af6e4c7e", codeTutor: 1, codeTracks: 787, dailyChallenge: 20, dailyTest: 80, codeTests: 4, skillrackPoints: 3334 },
-  { collegeId: "SEC23CJ051", name: "Ashwin Annamalai Lena", username: "ashnova07", skillrackUrl: "http://www.skillrack.com/profile/442544/3182f07070c1b95e6d852e8fc13a350d4b2694a2", codeTutor: 80, codeTracks: 731, dailyChallenge: 23, dailyTest: 34, codeTests: 6, skillrackPoints: 2368 },
-  { collegeId: "SEC23CJ060", name: "MUPIDATHY GOWTHAM. T", username: "Gowtham_tf", skillrackUrl: "http://www.skillrack.com/profile/442576/ceb2478ab8e73838a7f08a14b83ca4083b676359", codeTutor: 98, codeTracks: 516, dailyChallenge: 5, dailyTest: 5, codeTests: 5, skillrackPoints: 1292 }
-];
+/**
+ * Helper to get clean human-readable batch display name
+ * e.g. "batch-2028" -> "Batch 2028"
+ */
+export const formatBatchName = (batchKey = '') => {
+  if (batchKey === 'all') return 'All Batches';
+  const match = batchKey.match(/\d+/);
+  return match ? `Batch ${match[0]}` : batchKey;
+};
+
+/**
+ * Dynamic batch configurations generated automatically from batchesData keys
+ * Sorted in descending order by year (e.g. Batch 2030, Batch 2029, Batch 2028, Batch 2027)
+ */
+export const batches = Object.keys(batchesData)
+  .sort((a, b) => {
+    const numA = parseInt((a.match(/\d+/) || [0])[0], 10);
+    const numB = parseInt((b.match(/\d+/) || [0])[0], 10);
+    return numB - numA;
+  })
+  .map((batchKey) => {
+    const displayName = formatBatchName(batchKey);
+    return {
+      id: batchKey,
+      name: displayName,
+      shortName: displayName,
+      badge: '',
+      isDefault: batchKey === 'batch-2028'
+    };
+  });
+
+export const ALL_BATCHES_OPTION = {
+  id: "all",
+  name: "All Batches",
+  shortName: "All Batches",
+  badge: ""
+};
+
+/**
+ * All tracked LeetCode usernames across all batches
+ */
+export const usernames = Object.values(batchesData).flatMap(batchMap => Object.keys(batchMap));
+
+/**
+ * Username -> Display Name mapping
+ */
+export const userNamesMap = Object.assign({}, ...Object.values(batchesData));
+
+/**
+ * Automatically combined students array directly from batchesData
+ */
+export const students = Object.entries(batchesData).flatMap(([batchKey, batchUsers]) => {
+  return Object.entries(batchUsers).map(([username, name]) => {
+    return {
+      batch: batchKey,
+      name,
+      username,
+      collegeId: username.toUpperCase().startsWith("SEC") ? username.toUpperCase() : ""
+    };
+  });
+});
+
+/**
+ * Access helpers
+ */
+export const getStudentsByBatch = (batchId) => {
+  if (!batchId || batchId === 'all') return students;
+  return students.filter(s => s.batch === batchId || (batchId === 'batch-2028' && s.batch === '2023-2028'));
+};
+
+export const getUsernamesByBatch = (batchId) => {
+  if (!batchId || batchId === 'all') return usernames;
+  const batchMap = batchesData[batchId] || batchesData['batch-' + batchId];
+  return batchMap ? Object.keys(batchMap) : [];
+};
+
+export const getBatchById = (batchId) => {
+  if (batchId === 'all') return ALL_BATCHES_OPTION;
+  return batches.find(b => b.id === batchId) || {
+    id: batchId,
+    name: formatBatchName(batchId),
+    shortName: formatBatchName(batchId)
+  };
+};

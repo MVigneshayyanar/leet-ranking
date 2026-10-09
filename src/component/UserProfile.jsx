@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, ExternalLink, Calendar, Code, Trophy, Zap, Activity } from "lucide-react";
+import { ArrowLeft, ExternalLink, Calendar, Code, Trophy, Zap, Activity, CheckCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
-import { userNamesMap } from "../data/sampleData";
+import { userNamesMap, students } from "../data/sampleData";
 
 const UserProfile = () => {
     const { username } = useParams();
@@ -19,10 +19,15 @@ const UserProfile = () => {
                 const API_BASE_URL = "https://leetcode-api-ecru.vercel.app";
                 const response = await axios.get(`${API_BASE_URL}/userProfile/${username}`);
                 const data = response.data;
+
+                const studentInfo = students.find(s => s.username === username);
                 
                 setUserData({
                     username: username,
                     name: userNamesMap[username] || username,
+                    batch: studentInfo?.batch ? (studentInfo.batch.includes('2028') ? 'Batch 2028' : (studentInfo.batch.match(/\d+/) ? `Batch ${studentInfo.batch.match(/\d+/)[0]}` : studentInfo.batch)) : "Batch 2028",
+                    collegeId: studentInfo?.collegeId || "",
+                    skillrackPoints: studentInfo?.skillrackPoints || 0,
                     rank: data.ranking || "N/A",
                     easy: data.easySolved || 0,
                     medium: data.mediumSolved || 0,
@@ -79,30 +84,40 @@ const UserProfile = () => {
     const COLORS = ['#4ade80', '#fbbf24', '#f87171'];
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-white p-4 md:p-8 overflow-y-auto no-scrollbar">
+        <div className="min-h-screen bg-[#0f172a] text-white p-3 sm:p-6 md:p-8 overflow-y-auto no-scrollbar pt-14 md:pt-8">
              {/* Back Button */}
             <button 
                 onClick={() => navigate(-1)}
-                className="flex items-center text-slate-400 hover:text-white mb-6 transition-colors group"
+                className="flex items-center text-slate-400 hover:text-white mb-4 sm:mb-6 transition-colors group cursor-pointer text-sm"
             >
-                <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft size={18} className="mr-1.5 group-hover:-translate-x-1 transition-transform" />
                 Back
             </button>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-7xl mx-auto">
                 {/* Profile Header Card */}
-                <div className="lg:col-span-2 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden">
+                <div className="lg:col-span-2 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                          <Trophy size={120} />
                     </div>
 
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold shadow-2xl">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-2xl shrink-0">
                         {userData.name.charAt(0)}
                     </div>
                     
-                    <div className="flex-1 text-center md:text-left z-10">
-                        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">{userData.name}</h1>
-                        <p className="text-blue-400 font-mono text-lg mb-4">@{userData.username}</p>
+                    <div className="flex-1 text-center md:text-left z-10 min-w-0">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-1 sm:mb-2 truncate">{userData.name}</h1>
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3 sm:mb-4">
+                            <p className="text-blue-400 font-mono text-base sm:text-lg">@{userData.username}</p>
+                            {userData.collegeId && (
+                                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                                    {userData.collegeId}
+                                </span>
+                            )}
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                Batch {userData.batch}
+                            </span>
+                        </div>
                         
                         <div className="flex flex-wrap justify-center md:justify-start gap-4">
                             <div className="bg-slate-900/60 px-4 py-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
@@ -111,7 +126,7 @@ const UserProfile = () => {
                                 <span className="font-bold text-white">{userData.rank.toLocaleString()}</span>
                             </div>
                             <div className="bg-slate-900/60 px-4 py-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
-                                <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                                <CheckCircle className="w-4 h-4 text-green-500" />
                                 <span className="text-slate-400 text-sm">Solved:</span>
                                 <span className="font-bold text-white">{userData.solved}</span>
                             </div>

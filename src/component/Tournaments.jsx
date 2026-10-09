@@ -201,20 +201,20 @@ const Tournaments = () => {
 
   return (
     <div className="h-full flex flex-col bg-[#1a1a1a]">
-      {/* Top Bar - Minimal Header */}
-      <div className="h-14 border-b border-[#2a2a2a] bg-[#1a1a1a] flex items-center justify-between px-4 shrink-0">
-         <div className="flex items-center gap-4">
-             <div className="flex items-center gap-2 text-white font-medium">
-               <Trophy size={18} className="text-yellow-500" />
-               <span>{problemData?.title || 'Loading...'}</span>
+      {/* Top Bar - Minimal Responsive Header */}
+      <div className="min-h-14 py-2 border-b border-[#2a2a2a] bg-[#1a1a1a] flex flex-wrap items-center justify-between px-3 sm:px-4 gap-2 shrink-0 pt-14 md:pt-2">
+         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+             <div className="flex items-center gap-1.5 sm:gap-2 text-white font-medium text-xs sm:text-sm">
+               <Trophy size={16} className="text-yellow-500 shrink-0" />
+               <span className="truncate max-w-[140px] sm:max-w-xs">{problemData?.title || 'Loading...'}</span>
              </div>
-             <div className="h-4 w-[1px] bg-[#333]"></div>
-             <div className="flex items-center gap-2">
-                <User size={14} className="text-gray-400" />
+             <div className="hidden sm:block h-4 w-[1px] bg-[#333]"></div>
+             <div className="flex items-center gap-1.5 bg-[#252525] px-2 py-1 rounded-lg border border-[#333]">
+                <User size={13} className="text-gray-400 shrink-0" />
                 <select 
                   value={playerName} 
                   onChange={(e) => setPlayerName(e.target.value)}
-                  className="bg-transparent border-none outline-none text-sm text-gray-300 w-40 cursor-pointer focus:text-white transition-colors"
+                  className="bg-transparent border-none outline-none text-xs text-gray-300 w-28 sm:w-36 cursor-pointer focus:text-white transition-colors"
                 >
                     <option value="" disabled>Select Player</option>
                     {usernames.map(u => (
@@ -226,39 +226,38 @@ const Tournaments = () => {
              </div>
          </div>
 
-         <div className="flex items-center gap-2">
+         <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
             <button 
                 onClick={fetchRandomProblem}
                 disabled={loadingProblem || isRunning || isSubmitting}
-                className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#2a2a2a] text-gray-300 hover:bg-[#333] transition-colors text-sm border border-[#333]"
+                className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-[#2a2a2a] text-gray-300 hover:bg-[#333] transition-colors text-xs border border-[#333] cursor-pointer"
             >
-                {loadingProblem ? <RefreshCw size={14} className="animate-spin" /> : <Shuffle size={14} />}
+                {loadingProblem ? <RefreshCw size={13} className="animate-spin" /> : <Shuffle size={13} />}
                 <span>Next</span>
             </button>
-            <div className="hidden lg:block h-4 w-[1px] bg-[#333] mx-1"></div>
             <button 
                 onClick={handleRunCode}
                 disabled={loadingProblem || isRunning || isSubmitting}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded bg-[#2a2a2a] text-gray-300 hover:bg-[#333] transition-colors text-sm"
+                className="flex lg:flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-[#2a2a2a] text-gray-300 hover:bg-[#333] transition-colors text-xs cursor-pointer border border-[#333]"
             >
-                {isRunning ? <RefreshCw size={14} className="animate-spin" /> : <Play size={14} />}
+                {isRunning ? <RefreshCw size={13} className="animate-spin" /> : <Play size={13} />}
                 <span>Run</span>
             </button>
             <button 
                 onClick={handleSubmitCode}
                 disabled={loadingProblem || isRunning || isSubmitting}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded bg-green-700/80 text-green-100 hover:bg-green-600 transition-colors text-sm"
+                className="flex lg:flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-green-700/80 text-green-100 hover:bg-green-600 transition-colors text-xs cursor-pointer"
             >
-                {isSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
+                {isSubmitting ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
                 <span>Submit</span>
             </button>
          </div>
       </div>
 
       {/* Main Content - Split Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Left Panel - Description */}
-        <div className="w-full lg:w-1/2 border-r border-[#2a2a2a] flex flex-col min-w-[300px]">
+        <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-[#2a2a2a] flex flex-col min-w-0">
             <div className="bg-[#1a1a1a] border-b border-[#2a2a2a] flex items-center sticky top-0 z-10">
                <button 
                   onClick={() => setActiveLeftTab('description')}
@@ -444,9 +443,9 @@ const Tournaments = () => {
         </div>
 
         {/* Right Panel - Editor & Tabs */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col min-w-[300px]">
+        <div className="w-full lg:w-1/2 flex flex-col min-w-0 min-h-[360px] lg:min-h-0">
            {/* Top: Editor */}
-           <div className="flex-1 flex flex-col min-h-0 border-b border-[#2a2a2a]">
+           <div className="flex-1 flex flex-col min-h-[220px] border-b border-[#2a2a2a]">
               <div className="bg-[#1a1a1a] border-b border-[#2a2a2a] px-4 py-2 flex items-center justify-between h-10 shrink-0">
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Code2 size={14} />

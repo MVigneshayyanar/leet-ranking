@@ -80,7 +80,7 @@ app.post('/update-students', (req, res) => {
         if (match) {
             // Transform the array of student objects back into a string
             const formattedStudents = updatedStudents.map(s => 
-                `  { collegeId: "${s.collegeId || ''}", name: "${s.name}", username: "${s.username}", skillrackUrl: "${s.skillrackUrl || ''}", codeTutor: ${s.codeTutor || 0}, codeTracks: ${s.codeTracks || 0}, dailyChallenge: ${s.dailyChallenge || 0}, dailyTest: ${s.dailyTest || 0}, codeTests: ${s.codeTests || 0}, skillrackPoints: ${s.skillrackPoints || 0} }`
+                `  { batch: "${s.batch || '2023-2028'}", collegeId: "${s.collegeId || ''}", name: "${s.name}", username: "${s.username}", skillrackUrl: "${s.skillrackUrl || ''}", codeTutor: ${s.codeTutor || 0}, codeTracks: ${s.codeTracks || 0}, dailyChallenge: ${s.dailyChallenge || 0}, dailyTest: ${s.dailyTest || 0}, codeTests: ${s.codeTests || 0}, skillrackPoints: ${s.skillrackPoints || 0} }`
             ).join(',\n');
 
             const newContent = content.replace(studentsRegex, `export const students = [\n${formattedStudents}\n];`);
